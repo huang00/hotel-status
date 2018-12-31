@@ -1,0 +1,471 @@
+@import "./basic_const";
+
+html {
+    box-sizing: border-box;
+    height: 100%;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0;
+}
+
+ul {
+    margin: 0;
+    padding-left: 0;
+}
+
+li {
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+// vue编译结束前不显示带v-cloak的标签
+[v-cloak] {
+    display: none !important;
+}
+
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+input, textarea {
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+
+    // 以下3组必须分开写才能生效，不能合并
+    &::-webkit-input-placeholder {
+        color: #b6b7b7 !important;
+    }
+    &::-moz-placeholder {
+        color: #b6b7b7 !important;
+    }
+    &:-ms-input-placeholder {
+        color: #b6b7b7 !important;
+    }
+}
+
+.no-highlight {
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+label {
+    -webkit-tap-highlight-color: transparent;
+}
+
+// 内部全是float元素的容器，解决容器没有宽高的问题
+.float-container {
+    &:after, &:before {
+        display: table;
+        content: "";
+    }
+    &:after {
+        clear: both;
+    }
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+/***********************常用样式***********************/
+
+//UC 上有一个插件，导致页面显示不完全，出现了滚动条，把它隐藏掉，哼哼
+#trans-tooltip, #tip-arrow-bottom, #tip-arrow-top {
+    display: none;
+}
+
+.button-disable {
+    pointer-events: none;
+    opacity: 0.5
+}
+
+.textCent {
+    text-align: center;
+}
+
+.cursPoint {
+    cursor: pointer;
+}
+
+.marginLeftTwenty {
+    margin-left: 20px;
+}
+
+.marginLeft25 {
+    margin-left: 25px;
+}
+
+.marginLeftFifty {
+    margin-left: 50px;
+}
+
+.marginLeftFourty {
+    margin-left: 40px;
+}
+
+.marginLeftSixty {
+    margin-left: 60px;
+}
+
+.marginLeftEighty {
+    margin-left: 82px;
+}
+
+.marginLeft100 {
+    margin-left: 100px;
+}
+
+.marginLeft88 {
+    margin-left: 88px;
+}
+
+.fontSizi14 {
+    font-size: 14px;
+}
+
+.fontSizi12 {
+    font-size: 12px;
+}
+
+.fontSizi16 {
+    font-size: 16px;
+}
+
+.reserveBgColor {
+    background-color: $basic-hotelReserveColor;
+}
+
+.checkInBgcolor {
+    background-color: $basic-hotelCheckInColor;
+}
+
+.checkOutBgcolor {
+    background-color: $basic-hotelCheckOutColor;
+}
+
+.reserveFontColor {
+    color: $basic-hotelReserveColor;
+}
+
+.checkInFontcolor {
+    color: $basic-hotelCheckInColor;
+}
+
+.checkOutFontcolor {
+    color: #000;
+}
+
+.errorFontcolor {
+    color: #EE3333;
+}
+
+/***********************清楚浮动***********************/
+.clearfix:after {
+    content: " ";
+    clear: both;
+    height: 0;
+    visibility: hidden;
+    display: block;
+}
+
+.clearfix { zoom: 1; }
+
+/*********************** 居中 ***********************/
+.margin_x_c {
+    display: block;
+    margin: 0 auto;
+}
+.position_c {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.position_y_c {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: auto 0;
+}
+
+.position_x_c {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+}
+
+/*********************** 自定义滚动条样式 ***********************/
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background-color: white;
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+    border-radius: 2em;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    -webkit-border-radius: 2em;
+    -moz-border-radius: 2em;
+    border-radius: 2em;
+}
+
+/* 单行超出省略号 */
+.text-break-1 {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+/* 两行超出省略号 */
+.text-break-2 {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    word-wrap: break-word;
+    word-break: break-all;
+    line-break: anywhere;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+}
+
+/* 两行超出省略号 */
+.text-break-3 {
+    overflow:hidden;
+    text-overflow:ellipsis;
+    word-wrap: break-word;
+    word-break: break-all;
+    line-break: anywhere;
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:3;
+}
+
+.channel-logo {
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    border-radius: 50%;
+    background-position: center;
+    background-color: white;
+    background-repeat: no-repeat;
+    &.booking { background-image: url('./imgs/booking.png'); background-size: 100% 59%; }
+    &.qunar { background-image: url('./imgs/qunar.png'); background-size: 90% 65%; }
+    &.ctrip { background-image: url('./imgs/ctrip.png'); background-size: 90% 90%; }
+    &.elong { background-image: url('./imgs/elong.png'); background-size: 90% 69%; }
+    &.fliggy { background-image: url('./imgs/fliggy.png'); background-size: 84% 75%; }
+    &.meituan { background-image: url('./imgs/meituan.png'); background-size: 90% 90%; }
+    &.tongcheng { background-image: url('./imgs/tongcheng.png'); background-size: 90% 90%; }
+    &.lvmama { background-image: url('./imgs/lvmama.png'); background-size: 79% 67%; }
+    &.mafengwo { background-image: url('./imgs/mafengwo.png'); background-size: 90% 67%; }
+    &.tuniu { background-image: url('./imgs/tuniu.png'); background-size: 90% 90%; }
+    &.tujia { background-image: url('./imgs/tujia.png'); background-size: 80% 57%; }
+    &.yiqiyou { background-image: url('./imgs/yiqiyou.png'); background-size: 80% 67%; }
+    &.airbnb { background-image: url('./imgs/airbnb.png'); background-size: 79% 67%; }
+    &.xiaozhu { background-image: url('./imgs/xiaozhu.png'); background-size: 100% 85%; }
+    &.agoda { background-image: url('./imgs/agoda.png'); background-size: 79% 67%; }
+}
+
+/* 禁止用户选中 */
+.disabled-select {
+    user-select: none;
+}
+
+.order-modal-wrap{
+    .ivu-modal-header{background: #89A0B1FF;padding:11px 16px}
+    .ivu-modal-body{padding:20px 0 0 0;max-height: 400px;overflow: auto}
+    .ivu-modal-close{
+        top: 9px;
+        .ivu-icon-ios-close{
+            font-size: 24px;
+            color: #fff;
+            font-weight: 600
+        }
+    }
+    .item-wrap{
+        padding:0 10px;
+        height: 66px;
+        background: #F5F9FAFF;
+        overflow: hidden;
+        margin-bottom:20px;
+        .item-left{
+            float: left;
+            padding-left: 17px;
+            border-left: 2px solid #1F5A8EFF;
+            line-height: 33px;
+            width: calc(100% - 120px);
+            .icon{
+                font-size: 20px;
+                margin-top: -2px;
+            }
+            .name{
+                display: inline-block;
+                font-size: 18px;
+                color: #1F5A8EFF;
+                vertical-align: middle;
+                margin-left: 15px;
+                width: 100px;
+                overflow: hidden;
+                text-overflow:ellipsis;
+                white-space: nowrap;
+            }
+            .channelType{
+                display: inline-block;
+                font-size: 14px;
+                width: 100px;
+                color: #666666;
+                vertical-align: middle;
+                overflow: hidden;
+                text-overflow:ellipsis;
+                white-space: nowrap;
+                .channel-logo{
+                    width: 19px;
+                    height: 19px;
+                    line-height: 19px;
+                    margin-right: 5px;
+                    background-color: #CDCDCD;
+                }
+            }
+            .order-ticket {
+                width:31px;
+                line-height:18px;
+                border-radius:6px;
+                color: white;
+                display: inline-block;
+                text-align: center;
+                &.connect {
+                    background:linear-gradient(270deg,rgba(234,166,166,1) 0%,rgba(214,119,119,1) 100%);
+                }
+                &.quickly {
+                    background:linear-gradient(270deg,rgba(154,199,225,1) 0%,rgba(94,155,203,1) 100%);
+                }
+            }
+            .roomInfo{
+                display: inline-block;
+                overflow: hidden;
+                width: 240px;
+                font-size:14px;
+                color: #999999;
+                overflow: hidden;
+                text-overflow:ellipsis;
+                white-space: nowrap;
+            }
+            .date{
+                display: inline-block;
+                overflow: hidden;
+                width: 160px;
+                font-size:14px;
+                color: #999999;
+            }
+            .price{
+                float: right;
+                display: inline-block;
+                overflow: hidden;
+                font-size:14px;
+                color: #D67777FF;
+                width: 82px;
+                overflow: hidden;
+                text-overflow:ellipsis;
+                white-space: nowrap;
+            }
+        }
+        .item-right{
+            width: 120px;
+            margin-top: 17px;
+            float: right;
+        }
+    }
+    button {
+        border: 0;
+        cursor: pointer;
+        outline: none;
+        width: 110px;
+        height: 32px;
+        border-radius: 17px;
+        font-size: 14px;
+        &:not(.cancle) {
+            float: right;
+            color: white;
+        }
+        &.cancle {
+            background:linear-gradient(270deg,rgba(243,243,243,1) 0%,rgba(224,224,224,1) 100%);
+            box-shadow:2px 2px 8px 0px rgba(183,183,183,0.34);
+        }
+        &.update {
+            background:linear-gradient(270deg,rgba(153,200,135,1) 0%,rgba(79,152,55,1) 100%);
+            box-shadow:2px 2px 8px 0px rgba(169,242,156,0.45);
+        }
+        &.check-in {
+            background:linear-gradient(270deg,rgba(138,173,197,1) 0%,rgba(75,136,188,1) 100%);
+            box-shadow:2px 2px 8px 0px rgba(56,120,178,0.33);
+        }
+        &.check-out {
+            background:linear-gradient(270deg,rgba(221,175,141,1) 0%,rgba(184,91,43,1) 100%);
+            box-shadow:2px 2px 8px 0px rgba(242,191,156,0.45);
+        }
+        &.predetermine {
+            background:linear-gradient(270deg,rgba(147,202,240,1) 0%,rgba(83,167,233,1) 100%);
+            box-shadow:2px 2px 8px 0px rgba(56,120,178,0.33);
+        }
+        &.repair {
+            background:linear-gradient(270deg,rgba(224,144,144,1) 0%,rgba(195,78,45,1) 100%);
+            box-shadow:2px 2px 8px 0px rgba(242,191,156,0.45);
+        }
+        &.confirm {
+            background:linear-gradient(270deg,rgba(138,173,197,1) 0%,rgba(75,136,188,1) 100%);
+            box-shadow:2px 2px 8px 0px rgba(56,120,178,0.33);
+        }
+    }
+}
+
+/* 箭头 ——》 向下 */
+.arrow-down:before {
+    left: 60px;
+    bottom: -10px;
+    content: " ";
+    border-width:10px 10px 0;
+    border-style:solid;
+    border-color:rgba(0, 0, 0, .5) transparent transparent;/*灰 透明 透明 */
+    position:absolute;
+    z-index: 1;
+}

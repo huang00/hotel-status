@@ -1,0 +1,46 @@
+.room-type {
+    box-sizing: border-box;
+    font-size: 14px;
+    position: relative;
+    .room-type-item {
+        background:rgba(234,234,234,1);
+        border-radius:4px;
+        position: relative;
+        padding-left: 50%;
+        margin-bottom: 6px;
+        .room-type-name {
+            float: left;
+            width: 50%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+        }
+        .room-name {
+            float: left;
+            width: 100%;
+            .room-name-item {
+                height: 80px;
+                text-align: center;
+                color: #999999;
+                position: relative;
+                &.first {
+                    height: 74px;
+                }
+                &:after {
+                    content: " ";
+                    background: #CADBE8;
+                    width: 2px;
+                    position: absolute;
+                    right: -2px;
+                    height: 70px;
+                }
+            }
+        }
+        .room-type-name, .room-name-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
+    }
+}

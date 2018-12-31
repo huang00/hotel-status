@@ -1,0 +1,38 @@
+/*********************视觉设计规范*********************/
+
+// 基本-主色
+$basic-primary: #1F5A8E;
+$basic-primary-highlight: mix($basic-primary, #fff, 80%);
+// 基本-辅色
+//$basic-secondary: #63c59e;
+//$basic-secondary-highlight: mix($basic-secondary, #fff, 80%);
+// 基本-提示色
+$basic-warning: #f02b55;
+$basic-warning-highlight: mix($basic-warning, #fff, 80%);
+
+//$text-weak: #9fb9cc;
+// 文字-提示。最浅的文字颜色，一般用做placeholder
+$text-hint: #8d8d8d;
+// 文字-凸显
+//$text-highlight: #36b459;
+// 文字-反白。用在深色背景上
+$text-white: #ffffff;
+
+// 线框-分隔线
+//$line-separator: #def0f2;
+// 线框-表单框线
+//$line-border: #D3D9DE;
+// 线框-弹出框背景色
+//$dlg-background: #f3f7f8;
+
+/***********************常用样式***********************/
+// 房间预定颜色
+$basic-hotelReserveColor: #00CC90;
+// 房间入住颜色
+$basic-hotelCheckInColor: #1F96FC;
+// 房间退房颜色
+$basic-hotelCheckOutColor: #C1C1C1; // #c1c1c1
+// 被选中的房间的样式宽度
+$basic-hotelSelectWidth: 85px;
+// 被选中的房间的样式宽度
+$basic-hotelSelectHeight: 65px;

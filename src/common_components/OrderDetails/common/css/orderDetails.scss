@@ -1,0 +1,60 @@
+.order-details-warpper {
+    padding-top: 20px;
+}
+
+.scroll-container {
+    height: 460px;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-left: -10px;
+    padding-left: 10px;
+    color: #666666;
+    .main-content {
+        min-height: 410px;
+    }
+}
+
+.order-status {
+    display: inline-block;
+    line-height: 20px;
+    width: 20px;
+    text-align: center;
+    color: white;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-right: 2px;
+    &.predetermine {
+        background: #EA9A70;
+    }
+    &.check-in {
+        background: #52ADF5;
+    }
+    &.unsubscribe {
+        background: #C7C7C7;
+    }
+}
+
+/* padding 左边和右边个10px */
+.padding-l-r-10 {
+    padding: 0 15px;
+}
+
+.input-number {
+    .ivu-input-number-handler-wrap {
+        display: none;
+    }
+}
+.input-number.logo-yen {
+    .ivu-input-number-input-wrap {
+        .ivu-input-number-input {
+            padding-left: 20px;
+        }
+        &:before {
+            content: '¥';
+            width: 20px;
+            text-align: center;
+            font-size: 14px;
+            position: absolute;
+        }
+    }
+}

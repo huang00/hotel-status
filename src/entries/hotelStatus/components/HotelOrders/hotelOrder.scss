@@ -1,0 +1,281 @@
+.hotel-orders {
+    min-width: 3000px;
+    position: relative;
+    overflow: hidden;
+    .grid {
+        height: 80px;
+        width: 100px;
+        border-right: 1px solid #F0F0F0;
+        border-top: 1px solid #F0F0F0;
+        padding: 5px;
+        cursor: pointer;
+        .grid-inner-box {
+            height: 70px;
+            width: 90px;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+        }
+    }
+    .room-type-grid {
+        .room-item-grid {
+            float: left;
+            position: relative;
+            .room-info {
+                display: none;
+                background:rgba(208,230,254,.5);
+                border-radius:2px;
+                padding: 10px 5px;
+            }
+            .checked {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .mark {
+                    display: inline-block;
+                    width:44px;
+                    height:44px;
+                    background:linear-gradient(227deg,rgba(233,245,255,1) 0%,rgba(200,219,253,1) 100%);
+                    box-shadow:0px 0px 16px 0px rgba(99,140,250,0.2);
+                    border-radius: 50%;
+                    color: white;
+                    text-align: center;
+                    line-height: 44px;
+                }
+            }
+            &:hover {
+                .room-info { display: block; }
+            }
+        }
+    }
+    .tool-tip {
+        position: absolute;
+        min-width: 55px;
+        line-height: 40px;
+        font-size: 14px;
+        color: white;
+        text-align: center;
+        border-radius:0px 4px 4px 4px;
+        z-index: 1;
+        span {
+            padding: 0 12px;
+            cursor: pointer;
+            float: left;
+            &.predetermine {
+                background: rgba(13,13,13, 0.6);
+                border-bottom-left-radius: 4px;
+                &:after {
+                    left: 0;
+                    top: -8px;
+                    border-color: rgba(13,13,13, 0.6);
+                    border-top-width: 0;
+                    border-left-width: 0;
+                    border-right-width: 10px;
+                    border-style: dashed;
+                    border-left-color: transparent;
+                    border-right-color: transparent;
+                }
+            }
+            &.check-in {
+                background: rgba(13,13,13,0.5);
+            }
+            &.cancle {
+                background: rgba(13,13,13,0.3);
+                border-top-right-radius: 4px;
+                border-bottom-right-radius: 4px;
+            }
+            &:hover {
+                background: rgba(13,13,13, 0.7) !important;
+            }
+            &.predetermine:hover {
+                &:after {
+                    border-bottom-color: rgba(13,13,13, 0.7);
+                }
+            }
+            &:after {
+                content: " ";
+                position: absolute;
+                line-height: 0;
+                border-width: 8px;
+            }
+        }
+    }
+    .tool-tip.overflow-left {
+        .predetermine {
+            background: rgba(13,13,13, 0.6);
+            border-radius: 4px 0 0 4px;
+            &:after {
+                display: none;
+            }
+        }
+        .cancle {
+            background: rgba(13,13,13,0.3);
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 4px;
+            &:after {
+                right: 0;
+                top: -8px;
+                content: " ";
+                border-color: rgba(13,13,13, 0.3);
+                border-top-width: 0;
+                border-right-width: 0;
+                border-left-width: 10px;
+                border-style: dashed;
+                border-left-color: transparent;
+            }
+            &:hover {
+                &:after {
+                    border-bottom-color: rgba(13,13,13, 0.7);
+                }
+            }
+        }
+    }
+    .tool-tip.overflow-top {
+        .predetermine {
+            border-radius: 4px 0 0 0;
+            &:after {
+                left: 0;
+                top: 40px;
+                border-color: rgba(13,13,13, 0.6);
+                border-bottom-width: 0;
+                border-left-width: 0;
+                border-right-width: 10px;
+                border-top-width: 8px;
+                border-style: dashed;
+                border-left-color: transparent;
+                border-right-color: transparent;
+            }
+        }
+    }
+    .tool-tip.overflow-top.overflow-left {
+        .predetermine {
+            border-radius: 4px 0 0 4px;
+        }
+        .cancle {
+            border-radius: 0 4px 0 0;
+            &:after {
+                right: 0;
+                top: 40px;
+                content: " ";
+                border-color: rgba(13,13,13, 0.3);
+                border-bottom-width: 0;
+                border-right-width: 0;
+                border-top-width: 8px;
+                border-left-width: 10px;
+                border-style: dashed;
+                border-left-color: transparent;
+            }
+            &:hover {
+                &:after {
+                    border-top-color: rgba(13,13,13, 0.7);
+                }
+            }
+        }
+    }
+    .order-info-wrapper {
+        position: absolute;
+        height: 80px;
+        transition: initial;
+        padding: 5px;
+        cursor: pointer;
+        .impact-remind {
+            position: absolute;
+            text-align: center;
+            line-height: 36px;
+            width: 134px;
+            font-size: 14px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, .5);
+            color: white;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            top: -45px;
+        }
+        .impact-remind.show-down {
+            bottom: -45px;
+            top: initial;
+            &:before {
+                top: -10px;
+                bottom: initial;
+                border-width:0 10px 10px;
+                border-color: transparent transparent rgba(0, 0, 0, .5);/*灰 透明 透明 */
+                position:absolute;
+            }
+        }
+    }
+    .hour-room-wrapper {
+        position: absolute;
+        height: 25px;
+        width: 25px;
+        overflow: hidden;
+        z-index: 1;
+        line-height: 25px;
+        border-radius: 4px;
+        background: #FAE3E3;
+        color: #E1544C;
+        transition: all .3s;
+        cursor: pointer;
+        .icon {
+            display: inline-block;
+            height: 11px;
+            width: 11px;
+            background: url('./img/hour-room-icon.png') no-repeat center;
+            vertical-align: middle;
+            margin-left: 7px;
+            margin-right: 3px;
+        }
+        &:hover {
+            width: 76px;
+        }
+        &.impact {
+            border-radius: 0;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            height: 20px;
+            line-height: 20px;
+        }
+        &.special-top.impact {
+            height: 15px;
+            line-height: 15px;
+            top: 0 !important;
+        }
+    }
+    /* 切换钟点房菜单 */
+    .switch-hours-room-wrapper {
+        position: absolute;
+        max-width: 439px;
+        top: 0;
+        border: 1px solid red;
+        .switch-hours-room {
+            height: 41px;
+            line-height: 41px;
+            background: blue;
+            width: 60px;
+        }
+    }
+    .shadow-box-wrapper, .dashed-box-wrapper {
+        position: absolute;
+        padding: 5px;
+    }
+    .shadow-box-wrapper {
+        .predetermine {
+            background:rgba(254, 239, 231, .6);
+        }
+        .check-in {
+            background:rgba( 232, 242, 250, .6);
+        }
+    }
+    .dashed-box-wrapper {
+        .predetermine {
+            border:1px dashed #EA9A70;
+        }
+        .check-in {
+            border:1px dashed #52ADF5;
+        }
+    }
+    .order-base {
+        height: 70px;
+        border-radius: 4px;
+    }
+}
