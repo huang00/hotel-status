@@ -64,14 +64,16 @@ export default {
          * 价格保留两位小数。 金额最大一百万
          * @param item {Object} 数据对象
          * @param fieldName {String} 字段名
-         * @param fn {Function} 需要执行的函数
+         * @param callback {Function} 需要执行的函数
          */
-        moneyToDecimal2 (item, fieldName, fn) {
+        moneyToDecimal2 (item, fieldName, callback) {
             let repReg = /^\D*([0-9]\d*(\.\d{2})?).*$/
             item[fieldName] = item[fieldName].toString().replace(repReg, '$1')
             if (item[fieldName] >= 1000000)
-                item.suborderAmountViewErrMsg = '数额不可超过1,000,000'
-            fn && fn(item)
+                item[`${fieldName}ErrMsg`] = '数额不可超过1,000,000'
+            else
+                item[`${fieldName}ErrMsg`] = ''
+            callback && callback(item)
         }
     }
 }

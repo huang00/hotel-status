@@ -58,6 +58,7 @@
                     id: null,
                     financeType: 1,
                     priceView: '',
+                    priceViewErrMsg: '',
                     paymentId: this.orderPaymentList[0].id,
                     canEdited: 1
                 })

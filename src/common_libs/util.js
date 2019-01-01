@@ -463,6 +463,7 @@ export const newOrderData = {
     depositView: 0, // 收取的押金
     paidAmountView: 0, // 已收款
     subsidyView: 0,
+    otherCast: 0,
     contactPhone: '',
     orderNo: null,
     otaOrderNo: null,
@@ -512,6 +513,7 @@ export const mainOrderDataProcess = function (mainOrder, orderFromList, roomIds,
         let channelCode = orderFromList.filter(item => item.id === mainOrder.orderFrom)[0].channelCode
         payType = getChannelFrom(channelCode).playType
     }
+    mainOrder.otherCast = mainOrder.otherCast || 0
 
     return Object.assign(mainOrder, {
         paidAmountView: mainOrder.paidAmount / 100, // 实收金额
@@ -522,7 +524,8 @@ export const mainOrderDataProcess = function (mainOrder, orderFromList, roomIds,
         payType,
         records: mainOrder.records.map(item => {    // 财务记录
             return Object.assign(item, {
-                priceView: !item.price && item.price !== 0 ? '': item.price / 100
+                priceView: !item.price && item.price !== 0 ? '': item.price / 100,
+                priceViewErrMsg: ''
             })
         }),
         suborders: mainOrder.suborders.map(item => {
@@ -564,6 +567,12 @@ export const validateField = [
         validateField: [
             'roomId',
             'suborderAmountView'
+        ]
+    },
+    {
+        relationField: 'records',
+        validateField: [
+            'priceView'
         ]
     }
 ]
@@ -629,10 +638,59 @@ export const validateRoomRepeat = (suborderList) => {
 }
 
 const validateErrObj = {
-    contactName: '联系人姓名不能为空',
-    roomId: '房间号不能为空',
-    suborderAmountView: '订单金额不能为空'
+    contactName: {
+        required:  true,
+        validate (value) {
+            return validateErrObj._validate(
+                value,
+                [
+                    { required: true, msg: '联系人姓名不能为空'}
+                ]
+            )
+        }
+    },
+    roomId: {
+        required:  true,
+        validate (value) {
+            return validateErrObj._validate(
+                value,
+                [
+                    { required: true, msg: '房间号不能为空'}
+                ]
+            )
+        }
+    },
+    suborderAmountView: {
+        required:  true,
+        validate (value) {
+            return validateErrObj._validate(
+                value,
+                [
+                    { required: true, msg: '订单金额不能为空'}
+                ]
+            )
+        }
+    },
+    priceView: {
+        required:  false
+    },
+    _validate (value, validateList) {
+        /* 
+            [
+                { required: true, msg: '不能为空'},
+                { pattern: /djdjjd/, msg: '格式不正确'}
+            ]
+        */
+        for (let i = 0, len = validateList.length; i < len; i++) {
+            let item = validateList[i]
+            if (item.required) {
+                if (!value || !trimAll(value))
+                    return item.msg
+            }
+        }
+    }
 }
+
 export const mainOrderValidate = (mainOrder, validateField) => {
     let res = {}
     mainOrder.suborders &&
@@ -652,9 +710,15 @@ export const mainOrderValidate = (mainOrder, validateField) => {
             })
             empty.length && (res[item.relationField] = empty)
         } else {
-            if (!mainOrder[item] || !trimAll(mainOrder[item]) || mainOrder[`${item}ErrMsg`])
+            if (
+                mainOrder[`${item}ErrMsg`] || 
+                (
+                    validateErrObj[item].required &&
+                    validateErrObj[item].validate(mainOrder[item])
+                ) 
+            )
                 res[item] = {
-                    errMsg: mainOrder[`${item}ErrMsg`] || validateErrObj[item],
+                    errMsg: mainOrder[`${item}ErrMsg`] || validateErrObj[item].validate(mainOrder[item]),
                     field: item
                 }
         }
@@ -677,6 +741,7 @@ export const submitOrderDataFilter = (mainOrder) => {
         if (item.priceView || item.priceView === 0) {
             item.price = item.priceView * 100
             delete item.priceView
+            delete item.priceViewErrMsg
             return true
         }
     })

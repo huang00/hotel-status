@@ -6,7 +6,14 @@
                     <span style="font-size: 16px;">财务：</span>
                 </Col>
                 <Col :span="hideLabel ? 24 : 22">
-                    <div style="margin-bottom: 10px;" v-for="(item, index) in data.records" :key="index">
+                    <div
+                        :style="{
+                            position: 'relative',
+                            'margin-bottom': item.priceViewErrMsg? '25px': '10px'
+                        }"
+                        v-for="(item, index) in data.records"
+                        :key="index"
+                    >
                         <Select
                             style="width: 108px;"
                             :disabled="!item.canEdited"
@@ -56,6 +63,15 @@
                                     size="25"
                                     color="#286094"/>
                                 <span style="font-size: 14px;">添加支付项</span>
+                            </span>
+                        </span>
+                        <span
+                            class="wraning"
+                            v-if="item.priceViewErrMsg"
+                        >
+                            <span style="font-size: 14px;">
+                                <Icon type="md-alert" />
+                                数额不可超过1,000,000
                             </span>
                         </span>
                     </div>
@@ -132,6 +148,7 @@
             },
             onBlurPrice (item) {
                 this.moneyToDecimal2(item, 'priceView')
+                console.log('item', item)
                 this.reComputedFinance()
             }
         }
@@ -141,5 +158,13 @@
 <style lang="scss">
     .finance-item {
         margin-top: 20px;
+        .wraning {
+            position: absolute;
+            left: 141px;
+            top: 30px;
+            color: #D67777;
+            height: 22px;
+            z-index: 1;
+        }
     }
 </style>

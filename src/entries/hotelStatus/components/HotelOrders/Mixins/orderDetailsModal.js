@@ -67,8 +67,11 @@ export default {
         handlerUpdate () {
             /* 修改订单 */
             let errObj = mainOrderValidate(this.mainOrderData, validateField)
+            console.log('errObj', errObj)
             if (isEmptyObject(errObj)) {
                 this.mainOrderData.type = this.mainOrderData.id ? 4: 1
+                console.log('验证成功')
+                return false
                 this.saveOrder(submitOrderDataFilter(this.mainOrderData))
             } else
                 this.$root.Bus.$emit('on-order-form-validate', errObj)
