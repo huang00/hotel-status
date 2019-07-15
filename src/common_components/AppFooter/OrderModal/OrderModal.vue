@@ -133,7 +133,7 @@
             color:#999999FF;
         }
         .custom-scrollbar{
-            height: 258px;
+            max-height: 258px;
             overflow: auto
         }
         .item-wrap{
@@ -142,6 +142,7 @@
             background: #F5F9FAFF;
             overflow: hidden;
             margin-top:20px;
+            cursor: pointer;
             .item-left{
                 float: left;
                 padding-left: 17px;
@@ -229,6 +230,9 @@
                 margin-top: 17px;
                 float: right;
             }
+        }
+        .item-wrap:hover{
+            background: #E9F0F2FF
         }
         .item-wrap:nth-child(1){
             margin-top: 0

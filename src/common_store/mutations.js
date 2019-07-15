@@ -2,7 +2,7 @@
  * @Author: huangchao 
  * @Date: 2018-12-06 11:15:27 
  * @Last Modified by: huangchao
- * @Last Modified time: 2018-12-27 15:49:33
+ * @Last Modified time: 2019-01-24 18:05:39
  */
 
 export default {
@@ -36,5 +36,17 @@ export default {
     },
     setRealpriceList (state, data) {
         state.realpriceList = data
+    },
+    setUserInfo (state, data) {
+        state.userInfo = data
+    },
+    setHotelList (state, data) {
+        state.hotelList = data
+    },
+    setAllPermissionList (state, data) {
+        state.allPermissionList = data
+    },
+    setUserPermissionList (state, data) {
+        state.userPermissionList = data
     }
 }

@@ -1,13 +1,9 @@
-.order-details-warpper {
-    padding-top: 20px;
-}
-
 .scroll-container {
     height: 460px;
     overflow-y: auto;
-    padding-right: 6px;
-    margin-left: -10px;
+    padding-right: 10px;
     padding-left: 10px;
+    margin: 0 -10px;
     color: #666666;
     .main-content {
         min-height: 410px;

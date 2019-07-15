@@ -3,6 +3,7 @@
         <router-view
             :subMenuSlot="true"
             :hide-footer="false"
+            :init-request-data="initRequestData"
             page="hotelStatus">
         </router-view>
     </div>
@@ -12,12 +13,10 @@
     import VueRouter from 'vue-router';
     import 'common_assets/fonts/iconfont/iconfont.css'
     import iView from 'iview';
-    import 'iview/dist/styles/iview.css'
+    import '!style-loader!css-loader!less-loader!../../theme/index.less'
     import util from 'common_libs/util'
-    // import pageonload from 'common_libs/pageonload';
     import router from './router';
     import store from './store';
-    // import vTitle from '../../vue_plugins/v_title'
     import Bus from '../../bus/'
     import 'babel-polyfill'
     
@@ -26,13 +25,19 @@
     
     Vue.use(iView);
     Vue.use(VueRouter);
-    // Vue.use(vTitle);
+
     export default {
         name: 'app',
         components: {},
         data() {
             return {
-                Bus
+                Bus,
+                initRequestData: [
+                    'getOrderFromList',
+                    'getOrderPaymentList',
+                    'getOrderPaymentTypeList',
+                    'getRoomTypeList'
+                ]
             }
         },
         // 通过 router 配置参数注入路由，从而让整个应用都有路由功能

@@ -55,14 +55,14 @@ const prodWebpackConfig = {
         }),
         // Compress extracted CSS. We are using this plugin so that possible
         // duplicated CSS from different components can be deduped.
-        new OptimizeCSSPlugin({
-            cssProcessorOptions: {
-                safe: true,
-                discardComments: {
-                    removeAll: true
-                }
-            }
-        }),
+        // new OptimizeCSSPlugin({
+        //     cssProcessorOptions: {
+        //         safe: true,
+        //         discardComments: {
+        //             removeAll: true
+        //         }
+        //     }
+        // }),
         // generate dist index.html with correct asset hash for caching.
         // you can customize output by editing /index.html
         // see https://github.com/ampedandwired/html-webpack-plugin
@@ -94,6 +94,11 @@ const prodWebpackConfig = {
             {
                 from: path.resolve(__dirname, '../static'),
                 to: config.build.assetsSubDirectory,
+                ignore: ['.*']
+            },
+            {
+                from: path.resolve(__dirname, '../assets'),
+                to: './',
                 ignore: ['.*']
             }
         ]),

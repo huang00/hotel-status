@@ -5,6 +5,20 @@
 		color:#666666;
 		.s-row-line {
 			line-height:28px;
+			.roomInfo{
+				overflow: hidden;
+				span{
+					display: block;
+					max-width: 140px;
+					float: left;
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis
+				}
+				span:nth-child(1){
+					margin-right: 20px
+				}
+			}
 		}
 		.order {
 			padding: 7px 10px; 
@@ -48,7 +62,6 @@
 			border-radius:6px;
 			line-height:22px;
 			height: 22px;
-			
 		}
 		.money {
 			font-size:14px;
@@ -79,14 +92,14 @@
 					</div> 
 				</div>
 				<div class="s-row-line">
-					<div>
+					<div class="roomInfo">
 						<span>{{item.roomNo}}</span>
 						<span>{{item.roomTypeName}}</span>
 					</div>
 				</div>
 				<div class="s-row-line s-row-cont">
 					<div>{{item.checkInAt}} ~ {{item.checkOutAt}}</div>
-					<div><Icon type="md-moon" style="margin-right:2px" />{{item.nights}}晚</div>
+					<div><Icon type="md-moon" style="margin-right:2px;margin-top:-2px" />{{item.nights}}晚</div>
 				</div>
 				<div class="s-row-line s-row-cont">
 					<div >订单号：{{item.orderId}}</div>

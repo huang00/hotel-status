@@ -1,0 +1,67 @@
+.hotelInfo{
+    $base-color: #235F92;
+    width: 90%;
+    .add-hotel {
+        margin-top: 40px;
+        text-align: right;
+		.textCent {
+			width: 119px;
+			height: 36px;
+			line-height: 36px;
+			font-size: 14px;
+			border: 1px solid $base-color;
+			border-radius: 20px;
+			display: inline-block;
+			color: #9AA7C1;
+            transition: color .3s;
+            margin-right: 30px;
+		    &:hover {
+			  color: $base-color;
+			}
+		}
+    }
+    .title{
+		color: #205C91;
+		padding-left: 6px;
+		border-left: 4px solid #215D91;
+		font-size: 16px;
+		font-family:"PingFangSC-Regular";
+        font-weight:400;
+        span{
+            font-size: 12px;
+            color: #9AA7C1;
+            vertical-align: bottom
+        }
+    }
+    .hotelInfoChange{
+		.changeWrap{
+            padding: 30px;
+            overflow: hidden;
+			.hotelTab{
+				position: relative;
+                // width: 600px;
+                .tabs-nav-container{
+                    .tabs-nav-wrapper{
+                        background-color: rgb(247, 247, 247);
+                        .tabs-nav{
+                            // margin:none !important;
+                            margin-left: 0 !important;
+                        }
+                        .active{
+                            background-color: #fff !important;
+                        }
+                        .nav-item:hover{
+                            background-color: #fff;
+                        }
+                    }
+                }
+            }
+		}
+    }
+    .modal-header-wrapper{
+        padding: 10px 0;
+    }
+    .modal-footer-wrapper{
+        bottom: 20px !important;
+    }
+}   

@@ -2,7 +2,7 @@
  * @Author: huangchao 
  * @Date: 2018-11-29 11:00:39 
  * @Last Modified by: huangchao
- * @Last Modified time: 2018-12-17 17:09:54
+ * @Last Modified time: 2019-02-12 16:36:33
  */
 <template>
     <div class="app-main">
@@ -12,7 +12,7 @@
             :style="{
                 'padding-bottom': hideFooter ? '0px': '40px'
             }"
-        >
+        > 
             <app-header
                 :subMenuList="subMenuList"
                 :hide-search="hideSearch">
@@ -24,6 +24,7 @@
             </app-header>
             <main
                 :style="mainStyle"
+                class="main"
             >
                 <router-view></router-view>
             </main>
@@ -62,6 +63,19 @@
             hideFooter: {
                 type: Boolean,
                 default: true
+            },
+            initRequestData: {
+                type: Array,
+                default () {
+                    return [
+                        /* 
+                            'getOrderFromList',
+                            'getOrderPaymentList',
+                            'getOrderPaymentTypeList',
+                            'getRoomTypeList'
+                        */
+                    ]
+                }
             }
         },
         components: {
@@ -77,7 +91,7 @@
                         'overflow': 'auto'
                     }
                     : {
-                        'min-height': 'calc(100vh - 90px)'
+                        'min-height': 'calc(100vh - 90px)',
                     }
             }
         },
@@ -86,14 +100,18 @@
                 'getOrderFromList',
                 'getOrderPaymentList',
                 'getOrderPaymentTypeList',
-                'getRoomTypeList'
+                'getRoomTypeList',
+                'getUserInfo',
+                'getHotelList',
+                'getAllPermissionList'
             ])
         },
         created() {
-            this.getOrderFromList()
-            this.getOrderPaymentList()
-            this.getOrderPaymentTypeList()
-            this.getRoomTypeList()
+            this.getUserInfo()
+            this.getHotelList()
+            this.getAllPermissionList()
+            for (let i = 0, len = this.initRequestData.length; i < len; i++)
+                this[this.initRequestData[i]]()
         }
     }
 </script>

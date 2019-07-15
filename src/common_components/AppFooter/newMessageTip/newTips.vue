@@ -3,125 +3,102 @@
 ****/
 <template>
     <div >
-       <div :class="['tips-contant']" v-for='(item, index) in messageArr'  :id="'dom' + index "  :style="{bottom: bottomPosition(index, item) + 'px' }">
+       <div :class="['tips-contant']"  v-for='(item, index) in messageArr'  :id="'dom' + index "  :ref="'card' + item.id" :style="{bottom: bottomPosition(index, item) + 'px' }" @mouseenter="mouseenterCard" @mouseleave="mouseleaveCard">
        		<Card  :bordered="false" class="card">
 	        	<span class="close-it" @click='close(index)'>×</span>
 	            <div style="margin-bottom: 10px">
-	            	<span class="tip-flag" :style="{background: typeFunc(item.type).orderTypeBgColor, boxShadow: typeFunc(item.type).orderTypeShadow}">···</span>
+	            	<span class="tip-flag" :style="{background: typeFunc(item.topic).orderTypeBgColor, boxShadow: typeFunc(item.topic).orderTypeShadow}">···</span>
 	            	<!--您有一个新增订单  您有一个订单已被修改  您有一个订单已被取消-->
-	            	<span class="order-type"  :style="{color: typeFunc(item.type).color}">{{typeFunc(item.type).detailText}}</span>
-	            	<span class="look-detail" @click='lookDetial(item.orderId)'>查看详情 <Icon type="ios-arrow-forward"  class='self-arrow' /></span>
+	            	<span class="order-type"  :style="{color: typeFunc(item.topic).color}">{{returnHotelName(item.innId)}} {{typeFunc(item.topic).detailText}} ！</span>
+	            	<span class="look-detail" @click='lookDetial(item)'>查看详情 <Icon type="ios-arrow-forward"  class='self-arrow' /></span>
 	            </div>
-	            <div class="detail" :style="{background:typeFunc(item.type).detailBg }">
+	            <div class="detail" :style="{background:typeFunc(item.topic).detailBg }">
 					<div class="display self-row">
 						<div> 
-							<span>订单号：{{item.orderId}}</span>
-							<span class="pre" :style="{background: statusFunc(item.status).bgColor,boxShadow:statusFunc(item.status).bgShadow}">{{statusFunc(item.status).textType}}</span>	
+							<span>订单号：{{item.messageContent.orderId}}</span>
+							<span class="pre" :style="{background: statusFunc(item.messageContent.orderStatus).bgColor,boxShadow:statusFunc(item.messageContent.orderStatus).bgShadow}">{{statusFunc(item.messageContent.orderStatus).textType}}</span>	
 						</div>
-						<div>{{item.contactName}}</div>
+						<div class="contactName">{{item.messageContent.contactName}}</div>
 					</div>
 					<div class="self-row">
-						<span>{{item.roomTypeName}}</span>
-						<span>{{item.roomNo}}</span>
+						<span>{{item.messageContent.roomType}}</span>
+						<span>{{item.messageContent.rooms}}</span>
 					</div>
 					<div class="display self-row">
 						<div>
-							<span>2018-10-25 ~ 2018-10-27</span>
-							<Icon style='color:#DFCB99; margin-left: 20px' type="md-moon" />
-							<span>{{item.nights}}晚</span>
+							<span>{{item.messageContent.start}} ~ {{item.messageContent.end}}</span>
+							<Icon class="moon" type="md-moon" />
+							<span class="nights">{{item.nights}}晚</span>
 						</div>
-						<div :class="['channel-logo', getChannelFrom(item.channelCode).className]"></div>
+						<div :class="['channel-logo', getChannelFrom(returnChannelCode(item.messageContent.orderFrom).channelCode).className]">
+							<template v-if="!getChannelFrom(returnChannelCode(item.messageContent.orderFrom).channelCode)">
+								{{returnChannelCode(item.messageContent.orderFrom).channelName?returnChannelCode(item.messageContent.orderFrom).channelName:'无'}}
+								<!-- {{item.channelName.substring(0, 1)}} -->
+							</template>
+						</div>
+						<!-- <div :class="['channel-logo', getChannelFrom(item.orderFrom).className]"></div> -->
 					</div>            	
 	            </div>
 	        </Card>
-       </div>
+       	</div>
+	    <Modal v-model="modal2">
+            <p slot="header" style="text-align:center">
+                <Icon type="information-circled"></Icon>
+                <span style="font-size:18px;">提示</span>
+            </p>
+            <div style="text-align:center">
+                <p style="font-size:16px;color:#000">是否切换到 <span style="color:#235f92">{{returnHotelName(changeData.innId)}}</span> 门店查看？</p>
+            </div>
+            <div slot="footer">
+                <i-button type="warning" size="large" @click="modal2 = false">取消</i-button>
+                <i-button type="primary" size="large" @click="switchHotel">确定</i-button>
+            </div>
+        </Modal>
     </div>
 </template>
 <script>
 import {
-        getChannelFrom
-    } from 'common_libs/util'
-import {hotelStatusApiSercers} from '../../../entries/hotelStatus/api/API.js'    
+		getChannelFrom,
+		setCookie
+    } from 'common_libs/util' 
+import {
+	hotelStatusApiSercers
+} from 'hotelStatus/api/API'
+import {
+	publicHttpServer
+} from '@/api/api'
 export default {
 	name: 'newTips',
 	data () {
 		return {
 			getChannelFrom,
-			messageArr: [
-				{
-					channelName: "自来客",
-					checkInAt: 1545019200000,
-					checkOutAt: 1545278400000,
-					contactName: "周公子11111",
-					contactPhone: "",
-					id: 12652,
-					nights: 3,
-					orderId: 2786,
-					otaOrderNo: null,
-					roomNo: "1间101",
-					roomTypeName: "豪华房",
-					status: 0,
-					subTotal: 50000,
-					channelCode: '000001',
-					type: 'add',
-				},
-				{
-					channelName: "自来客",
-					checkInAt: 1545019200000,
-					checkOutAt: 1545278400000,
-					contactName: "dawn2222",
-					contactPhone: "",
-					id: 12653,
-					nights: 2,
-					orderId: 2881,
-					otaOrderNo: null,
-					roomNo: "102",
-					roomTypeName: "cc",
-					status: 2,
-					subTotal: 30000,
-					channelCode: '000031',
-					type: 'edit',
-				},
-				{
-					channelName: "自来客",
-					checkInAt: 1545019200000,
-					checkOutAt: 1545278400000,
-					contactName: "dawn33333",
-					contactPhone: "",
-					id: 12654,
-					nights: 2,
-					orderId: 2880,
-					otaOrderNo: null,
-					roomNo: "105",
-					roomTypeName: "dd",
-					status: 2,
-					subTotal: 30000,
-					channelCode: '000041',
-					type: 'cancel',
-				}
-			]
+			messageArr: [],
+			mouseEnterFlag:false,
+			modal2:false,
+			changeData:{}
 		}
 	},
 	mounted () {
 		// 最早的消息显示最上层
 		this.messageArr.reverse()
-		this.pushArr()
 	},
 	watch: {
-		// 逐条删除messageArr数据
-		messageArr (val, oldVal) {
-			if (val.length > 0) {
-				setTimeout( () => {
-					// this.messageArr.pop()
-				}, 3000)
-			}
+	},
+	computed: {
+		hotelList () {
+			let hotelList = this.$store.getters.hotelList
+			return hotelList
 		},
+		userInfo () {
+			let userInfo = this.$store.getters.userInfo
+			return userInfo
+		}
 	},
 	methods: {
 		//test 新消息来
-		pushArr () {
+		pushArr (message) {
 			var _this = this
-			sleep(2000)
+			sleep(10)
 			function sleep(numberMillis) {
 				// console.log(140)
 			    var now = new Date();
@@ -129,40 +106,50 @@ export default {
 			    while (true) {
 			        now = new Date();
 			        if (now.getTime() > exitTime) {
-			        	_this.messageArr.unshift({
-							channelName: "自来客" ,
-							checkInAt: 1545019200000,
-							checkOutAt: 1545278400000,
-							contactName: "fffff",
-							contactPhone: "",
-							id: 12654,
-							nights: 2,
-							orderId: 10060,
-							otaOrderNo: null,
-							roomNo: "105",
-							roomTypeName: "dd",
-							status: 2,
-							subTotal: 30000,
-							channelCode: '000003',
-							type: 'cancel',
-						})
+			        	// _this.messageArr.unshift({
+						// 	channelName: "自来客" ,
+						// 	checkInAt: 1545019200000,
+						// 	checkOutAt: 1545278400000,
+						// 	contactName: "fffff",
+						// 	contactPhone: "",
+						// 	id: 12654,
+						// 	nights: 2,
+						// 	orderId: 10060,
+						// 	otaOrderNo: null,
+						// 	roomNo: "105",
+						// 	roomTypeName: "dd",
+						// 	status: 2,
+						// 	subTotal: 30000,
+						// 	channelCode: '000003',
+						// 	type: 'cancel',
+						// })
+						_this.messageArr.push(message)
 			            return;
 			        }
 			    }
 			}
 		},
 		//查看详情
-		lookDetial (orderId) {
-			//test 新消息来
-			// this.pushArr()
-			// let orderId = '2786'
+		lookDetial (item) {
+			let orderId = item.messageContent.orderId
+			// 不是当前客栈的订单
+			if(item.innId != this.userInfo.innId){
+				this.changeData = item;
+				this.modal2 = true;
+				return;
+			}
+			//取消的订单无法点击
+			if(item.topic == 2){
+				this.$Message.error('取消的订单无法查看！')
+				return
+			}
 			hotelStatusApiSercers.getOrderInfoByOrderId(orderId).then(result => {
                 if (result.content && result.code === '000000') {
-                    this.$root.Bus.$emit('on-bus-look-order-detail', result.content, (res) => {
+                    this.$root.Bus.$emit('on-bus-look-order-detail', result.content,'look', (res) => {
                         console.log('订单详情')
                     })
                 }else{
-                    this.$Message(result.message)
+                    this.$Message.error(result.message)
                 }
             })
 		},
@@ -176,35 +163,35 @@ export default {
 		},
 		//每条信息距离底部的位置
 		bottomPosition (index, item) {
-			let num = index - this.messageArr.length
-			return num * (-10) + 49 
+			let num = this.messageArr.length - index - 1
+			return num * 145 + 60
 		},
 		/*type: add  edit cancel*/
 		typeFunc (type) {
 			switch (type) {
-				case 'add' : return {
+				case 1 : return {
 					orderTypeBgColor: 'linear-gradient(225deg,rgba(91,168,244,1) 0%,rgba(31,135,237,1) 100%)',    /*tip-flag背景颜色*/
 					orderTypeShadow: '2px 2px 6px 0px rgba(0,140,247,0.3)',    /* tip-flag背景阴影*/
 					orderTypeColor: '#008CF7',    /*tip-flag 消息类型文本颜色*/
 					color: '#008CF7',    /*您有一个 xx 订单文本颜色*/
-					detailText: '您有一个新增订单',    /*订单类型文本*/
+					detailText: '有一个新增订单',    /*订单类型文本*/
 					detailBg:  'rgba(245,249,250,1)',   /*消息主体框背景色*/
 				}
-				case 'edit' : return {
+				case 2 : return {
+					orderTypeBgColor: '#EAEAEA',
+					orderTypeColor: '#000',
+					color:'##666',
+					detailText: '有一个订单已被取消',
+					detailBg: 'rgba(250,250,250,1)',
+
+				}
+				case 3 : return {
 					orderTypeBgColor: 'linear-gradient(231deg,rgba(255,210,90,1) 0%,rgba(255,175,45,1) 100%)',
 					orderTypeShadow: '2px 2px 6px 0px rgba(245,166,35,0.34)' ,
 					orderTypeColor: '#F5A623', 
-					color:'#F5A623',
-					detailText: '您有一个订单已被修改',
+					color:'#43BD64',
+					detailText: '有一个订单已被修改',
 					detailBg:  'rgba(254,252,248,1)',
-				}
-				case 'cancel' : return {
-					orderTypeBgColor: '#EAEAEA',
-					orderTypeColor: '#000',
-					color:'#000',
-					detailText: '您有一个订单已被取消',
-					detailBg: 'rgba(254,252,248,1)',
-
 				}
 			}
 		},
@@ -225,17 +212,74 @@ export default {
 					bgColor: 'linear-gradient(225deg,rgba(91,168,244,1) 0%,rgba(31,135,237,1) 100%)',
 					bgShadow: '2px 2px 6px 0px rgba(0,140,247,0.3)' ,
 					textType: '住',
-				} 
+				}
+				case 3 : return {
+					bgColor: 'linear-gradient(225deg,rgba(91,168,244,1) 0%,rgba(31,135,237,1) 100%)',
+					bgShadow: '2px 2px 6px 0px rgba(0,140,247,0.3)' ,
+					textType: '住',
+				}
 			}
 		},
+		mouseenterCard() {
+			this.mouseEnterFlag = true
+		},
+		mouseleaveCard() {
+			this.mouseEnterFlag = false
+			setTimeout(() => {
+				this.$parent.autoCloseInfoCard()
+			}, 5000)
+		},
+
+		// 根据渠道daid返回渠道信息
+		returnChannelCode(id) {
+			let list = this.$store.state.orderFromList
+			let result = { channelCode: '',channelName:'' }
+			for(let z = 0;z < list.length;z++){
+				if(id == list[z].id){
+					result = list[z]
+				}
+			}
+			return result
+		},
+
+		// 返回客栈名
+		returnHotelName(id) {
+			let hotelList = this.hotelList;
+			let res = ''
+			for(let z = 0;z < hotelList.length;z++){
+				if(id == hotelList[z].innId){
+					res = hotelList[z].innName
+				}
+			}
+			return res
+		},
+
+		// 切换客栈
+		switchHotel () {
+			publicHttpServer.switchHotel({
+				innId: this.changeData.innId
+			}).then(res => {
+				if (res.code === '000000' && res.content) {
+					let { token, innId, userId } = res.content
+					setCookie('token', token)
+					setCookie('innId', innId)
+					setCookie('userId', userId)
+					window.location.reload()
+				}else{
+					alert(res.message)
+				}
+			})
+		}
 	},
 }
 </script>
 <style lang="scss">
 	.tips-contant {
+		transition: all 1s;
         /* bottom: 50px; */
         right: 20px;
-        position: fixed;
+		position: fixed;
+		z-index: 101;
         /* border: 1px solid blue; */
         width: 485px;
 		border-radius:4px;
@@ -259,7 +303,8 @@ export default {
         }
         .order-type {
         	font-size: 14px;
-        	margin: auto 10px;
+			margin: auto 10px;
+			margin-left: 4px;
         }
         .look-detail {
         	color: #999;
@@ -286,14 +331,28 @@ export default {
 			cursor: pointer;
         }
         .detail {
-        	padding: 10px;
-        	color: #666;
+        	padding: 3px 10px;
+			color: #666;
+			font-size: 12px;
+			color: #666666FF;
         	.display {
         		display:flex;
         		justify-content: space-between;
         	}
         	.self-row {
-        		line-height: 30px;
+				line-height: 24px;
+				.contactName{
+					color: #999999FF
+				}
+				.nights{
+					color: #666666FF;
+					font-weight:600;
+				}
+				.moon{
+					color:#DFCB99;
+					margin-left: 20px;
+					margin-top:-2px
+				}
         	}
         	.channel-logo {
         		width: 24px;

@@ -70,7 +70,7 @@
                         item.status === 1 &&
                         (
                             item.payType !== 'quickly' ||
-                            (item.payType === 'quickly' && checkOutDate === today)
+                            (item.payType === 'quickly' && checkOutDate <= today)
                         )
                     )
                         isCheckOut = true

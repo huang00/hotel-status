@@ -1,6 +1,6 @@
 import VueRouter from 'vue-router'
 import {setCookie} from 'common_libs/util';
-// import {testTokenEffectiveness} from 'url-config'
+import {testTokenEffectiveness} from 'url-config'
 
 // 注释里的是分块js名，加user_center_前缀是为避免和某个入口或chunk同名，否则会无法运行
 // 登陆路由 模块
@@ -8,7 +8,6 @@ const Main = r => import('common_components/Main/').then(r);
 const routes = [
     {
         path: '/',
-        name: 'main',
         component: Main,
         children: [{
             path: '',
@@ -43,19 +42,13 @@ const router = new VueRouter({
     },
 })
 router.beforeEach((to, from, next) => {
-    if (window.location.hostname === 'localhost') {
-        setCookie('token', 'ffaa900157ac45dd99de877f9528eba29810d1ecf94f409689115748b4e37fd8');
-        setCookie('userId', '34');
-        setCookie('innId', '124');
-    }
-    next()
-    // testTokenEffectiveness().then(resolve => {
-    //     if (resolve) {
-    //         next()
-    //     } else {
-    //         window.location.href = `${window.gBaseURL}/index/index.html`
-    //     }
-    // })
+    testTokenEffectiveness().then(resolve => {
+        if (resolve) {
+            next()
+        } else {
+            window.location.href = `/index/index.html`
+        }
+    })
 });
 router.afterEach(({to}) => {
 })

@@ -47,12 +47,6 @@ export let hotelStatusApiSercers = {
           
         })
     },
-    getInnInfo: (param) => {
-        return httpRequestor.get('/inn/inn/getInn', param).catch(err => {
-            console.log('请检查网络环境', err);
-          
-        })
-    },
     todayIn: (param) => {
         return httpRequestor.get('/order/todayIn', param).catch(err => {
             console.log('请检查网络环境', err);
@@ -104,4 +98,16 @@ export let hotelStatusApiSercers = {
             console.log('请检查网络环境', err);
         })
     },
+    getMatchNameResult: (param) => {
+      /* 获取匹配的姓名搜索结果 */
+      return httpRequestor.get('/inn/client/getClientByName', param).catch(err => {
+          console.log('请检查网络环境', err);
+      })
+    }, 
+    getMatchPhoneResult: (param) => {
+      /* 获取匹配的电话搜索结果 */
+      return httpRequestor.get('/inn/client/getClientByPhone', param).catch(err => {
+          console.log('请检查网络环境', err);
+      })
+    }, 
 };

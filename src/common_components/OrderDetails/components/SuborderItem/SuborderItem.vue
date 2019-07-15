@@ -40,7 +40,7 @@
                                     {{item.roomTypeName}}&nbsp;&nbsp;{{ item.roomNo }}
                                 </Option>
                             </Select>
-                            <span class="wraning" v-if="item.roomIdErrMsg">
+                            <span class="wraning" style="left: 31px;" v-if="item.roomIdErrMsg">
                                 <span style="font-size: 14px;">
                                     <Icon type="md-alert" />
                                     {{ item.roomIdErrMsg }}
@@ -73,6 +73,9 @@
                                     !!data.otaOrderNo
                                 "
                                 style="width:74px; margin-left: 10px;">
+                                <Option
+                                    v-if="item.isHourRoom === 1"
+                                    :value="0"> 0 晚</Option>
                                 <Option
                                     v-for="item in 60" :key="item"
                                     :value="item"> {{item}} 晚</Option>
@@ -129,20 +132,40 @@
                         class="suborder-client-wrapper"
                         v-for="(subItem, subIndex) in item.clients" :key="subIndex">
                         <div class="suborder-client flex">
-                            <div class="user-name flex-item">
+                            <div class="user-name flex-item" style="position: relative;">
                                 <i class="iconfont user-name-icon">&#xe720;</i>
                                 <Input
                                     :maxlength="inputMaxLen"
                                     :disabled="!item.checked && orderOprType === 'check-in'"
-                                    v-model="subItem.name"
+                                    v-model.trim="subItem.name"
+                                    @on-keyup="filterExpression(subItem, 'name')"
+                                    @on-focus="nameFocuse(subIndex, subItem,'name', 'first', index)"
+                                    @on-blur="myBlur(subIndex),filterExpression(subItem, 'name')"
+                                    @on-change="onChangeContactName(subItem.name, subIndex, index)"
                                     style="width: 145px; margin-left: 33px;"
                                     placeholder="入住人姓名"></Input>
+                                <div @click='inputIt(subIndex, subItem, index)' 
+                                  v-show="!(!item.checked && orderOprType === 'check-in') && nameInput && subIndex == inputBtn1 && clientIndexFlag == 'clientIndex' + index " 
+                                  class='inputBtn' style="width: 145px;left: 33px;">填入联系人</div>    
+                                <!-- <ul  v-show="!(!item.checked && orderOprType === 'check-in')  && showName && subIndex == inputBtn1 && clientIndexFlag == 'clientIndex' + index" class='sug-ul' style=" top: 39px;left: 31px;"> -->
+                                <ul  v-show="!(!item.checked && orderOprType === 'check-in')  && showName && subIndex == inputBtn1 && clientIndexFlag == 'clientIndex' + index" class='sug-ul' style=" top: 39px;left: 33px;">
+                                  <li class='sug-li'  v-for=' (n,myIndex) in nameList' @click='chooseName(n, index, subIndex)' :key='myIndex'>
+                                    <div style="line-height: 22px;" class='clearfix'>
+                                      <div v-html="brightenKeyword(n.name, subItem.name)" class='t-over'  style='float: left; width: 108px; text-align: left;'></div>
+                                      <div  class='t-over' style='float: right; text-align: right; width: 120px; '>{{n.telephoneNum}}</div>
+                                    </div>
+                                    <div class='clearfix' style="line-height: 22px;">
+                                      <span style='float:left;display:inline-block;text-align:left;'>历史入住{{n.checkInNum}}次，总房费</span>
+                                      <span style="float:left;display:inline-block;text-align:right;color:#D67777">￥{{n.roomAmount}}</span></div>
+                                  </li>
+                                </ul>
                             </div>
                             <div class="id-card flex-item">
                                 <Select
                                     :disabled="!item.checked && orderOprType === 'check-in'"
                                     placeholder="证件"
                                     v-model="subItem.identityType"
+                                    @on-change="validateIdCard(subItem)"
                                     style="width: 77px;">
                                     <Option
                                         v-for="sunItem in certificatesType" :key="sunItem.value"
@@ -154,16 +177,40 @@
                                     :maxlength="inputMaxLen"
                                     :disabled="!item.checked && orderOprType === 'check-in'"
                                     placeholder="证件号码"
-                                    v-model="subItem.identityNo"></Input>
+                                    @on-blur="validateIdCard(subItem)"
+                                    v-model="subItem.identityNo">
+                                </Input>
+                                <span class="wraning" style="width: 200px; left: 80px; bottom: 21px; height: 0;" v-if="subItem.identityNoErrMsg">
+                                    <span style="font-size: 14px;">
+                                        <Icon type="md-alert" />
+                                        {{ subItem.identityNoErrMsg }}
+                                    </span>
+                                </span>
                             </div>
-                            <div class="user-phone flex-item">
+                            <div class="user-phone flex-item" style="position: relative;">
                                 <Input
                                     style="width: 104px;"
                                     :disabled="!item.checked && orderOprType === 'check-in'"
-                                    @on-keyup="requiredNumber(subItem, 'phone')"
+                                    @on-keyup="validatePhoneNumber(subItem, 'phone')"
+                                    @on-focus="nameFocuse(subIndex, subItem,'phone', 'second', index)"
+                                    @on-blur="myBlur(subIndex),validatePhoneNumber(subItem, 'phone')"
+                                    @on-change="onChangeContactPhone(subItem.phone, subIndex)"
                                     placeholder="电话号码"
-                                    v-model="subItem.phone"
-                                    :maxlength="11"></Input>
+                                    v-model.trim="subItem.phone"
+                                    :maxlength="16"></Input>
+                                   
+                                <div @click='inputIt(subIndex, subItem, index)' v-show="!(!item.checked && orderOprType === 'check-in') && phoneInput && subIndex == inputBtn2 && clientIndexFlag == 'clientIndex' + index "class='inputBtn' style="width: 104px">填入联系人</div>    
+                                <ul  v-show="!(!item.checked && orderOprType === 'check-in') && showPhone && subIndex == inputBtn2 && clientIndexFlag == 'clientIndex' + index" class='sug-ul' style=" top: 39px;left: 0;">
+                                  <li  class='sug-li'  v-for=' (n,myIndex) in nameList' @click='chooseName(n,index, subIndex)' :key='myIndex'>
+                                    <div style="line-height: 22px;" class='clearfix'>
+                                      <div v-html="phoneKeyword(n.telephoneNum, subItem.phone)"  class='t-over'  style='float: left; width: 120px;text-align: left '></div>
+                                      <div class='t-over'  style='float: right;  width: 108px; text-align: right; width: 108px'>{{n.name}}</div>
+                                    </div>
+                                    <div class='clearfix' style="line-height: 22px;">
+                                      <span style='float:left;display:inline-block;text-align:left;'>历史入住{{n.checkInNum}}次，总房费</span>
+                                      <span style="float:left;display:inline-block;text-align:right;color:#D67777">￥{{n.roomAmount}}</span></div>
+                                  </li>
+                                </ul>
                             </div>
                             <div
                                 class="client-more"
@@ -268,10 +315,14 @@
         computedNights,
         formatDate,
         deepCopy,
+        changeMoney,
         TODAY,
         toDecimal2,
-        validateRoomRepeat
+        validateRoomRepeat,
+        accurateComputed,
+        validateRule,
     } from 'common_libs/util'
+    import NP from 'number-precision'
     import Base from '../Mixins/base'
     import {
         hotelStatusApiSercers
@@ -303,6 +354,10 @@
         data () {
             const _this = this
             return {
+                showName: false,
+                showPhone: false,
+                showNameFlag: false,
+                nameList: [],
                 computedNights,
                 formatDate,
                 newSubordersItem: {
@@ -323,7 +378,8 @@
                     name: null,
                     phone: '',
                     identityType: 0,
-                    identityNo: ''
+                    identityNo: '',
+                    identityNoErrMsg: ''
                 },
                 certificatesType: [ // 证件类型
                     {
@@ -345,12 +401,23 @@
                         let startDate = new Date(deepCopy(_this.dateList[0]).strDate)
                         let endDate = new Date(deepCopy(_this.dateList[_this.dateList.length - 1]).strDate)
                         startDate.setMonth(startDate.getMonth() - 1)
-                        endDate.setMonth(endDate.getMonth() + 2)
+                        // endDate.setMonth(endDate.getMonth() + 2)
                         return date.valueOf() <= startDate.valueOf() - 24 * 3600000 || date.valueOf() >= endDate.valueOf()
                     }
                 },
                 changedRoomIds: [], // 房间id已经改变的订单集合
-                changedCheckInDateIds: []  // 入住时间id已经改变的订单集合
+                changedCheckInDateIds: [],  // 入住时间id已经改变的订单集合
+                contactPerson: false, // 是否有联系人
+                contactMobilePhone: false, // 是否有联系电话
+                inputBtn1: '-1', //是否显示快速导入联系人 判断是哪一个input
+                inputBtn2: '-1', //是否显示快速导入电话 判断是哪一个input
+                nameInput: false,
+                phoneInput: false,
+                tempCacheName: {},
+                tempCachePhone: {},
+                clientIndexFlag: 'clientIndex',
+                identityNo: null,
+                identityType: null
             }
         },
         computed: {
@@ -370,23 +437,64 @@
                 }
             }
         },
+        watch: {
+          data: {
+            handler(val, oldVal) {
+              // 监听是否有联系人 和联系电话 oldVal.contactName oldVal.contactPhone
+              if (!val.contactName) {
+                this.contactPerson = false
+              } else {
+                this.contactPerson = true
+              }
+              if (!val.contactPhone) {
+                this.contactMobilePhone = false
+              } else {
+                this.contactMobilePhone = true
+              }
+            },
+            deep: true
+          }
+        },
         created() {
-            this.$root.Bus.$on('on-order-form-validate', (errObj) => {
-                let subordersErrMsg = errObj.suborders
-                if (subordersErrMsg) {
-                    this.data.suborders.map((item, index) => {
-                        for (let i = 0, len = subordersErrMsg.length; i < len; i++) {
-                            let subItem = subordersErrMsg[i]
-                            if (subItem.index === index) {
-                                for (let key in subItem) {
-                                    subItem[key] && 
-                                        (item[key+'ErrMsg'] = subItem[key].errMsg)
+            // 是否显示 快速导入按钮
+            if (!this.data.contactName) {
+              this.contactPerson = false
+            } else {
+              this.contactPerson = true
+            }
+            if (!this.data.contactPhone) {
+              this.contactMobilePhone = false
+            } else {
+              this.contactMobilePhone = true
+            }
+
+            if (this.$root.Bus) {
+                this.$root.Bus.$on('on-order-form-validate', (errObj) => {
+                    let subordersErrMsg = errObj.suborders
+                    if (subordersErrMsg) {
+                        this.data.suborders.map((item, index) => {
+                            for (let i = 0, len = subordersErrMsg.length; i < len; i++) {
+                                let subItem = subordersErrMsg[i]
+                                let clientsErrMsgList = subordersErrMsg[i].clients
+                                if (subItem.index === index) {
+                                    for (let key in subItem) {
+                                        subItem[key] && 
+                                            (item[key+'ErrMsg'] = subItem[key].errMsg)
+                                    }
+                                    if (clientsErrMsgList) {
+                                        clientsErrMsgList.map((clientsErrItem, clientsIndex) => {
+                                            for (let k = 0, kLen = item.clients.length; k < kLen; k++) {
+                                                if (k === clientsErrItem.index)
+                                                    item.clients[k].identityNoErrMsg = clientsErrItem.identityNo.errMsg
+                                            }
+                                        })
+                                    }
                                 }
                             }
-                        }
-                    })
-                }
-            })
+                        })
+                    }
+                })
+            }
             this.data.suborders.map(item => {
                 let checkInDate = +new Date(formatDate(item.checkInDateView))
                 if (this.orderOprType === 'check-in') {
@@ -415,8 +523,234 @@
             })
         },
         methods: {
+          // 获取匹配的联系人
+          getMatchName (obj) {
+            hotelStatusApiSercers.getMatchNameResult(obj).then(res => {
+                if (res.code === '000000' && res.content) {
+                  if (res.content.length) {
+                    for (let i = 0; i < res.content.length; i++) {
+                      res.content[i].roomAmount = changeMoney(res.content[i].roomAmount) || '0.00'
+                      res.content[i].checkInNum = res.content[i].checkInNum || '0'
+                    }
+                    this.nameList = res.content
+                    this.tempCacheName[obj.name] = res.content
+                    this.showName = true
+                  } else {
+                    this.nameList = []
+                    this.showName = false
+                  }
+                } else {
+                  this.nameList = []
+                  this.showName = false
+                }
+            })
+          },
+          getMatchPhone (obj, flag) {
+            hotelStatusApiSercers.getMatchPhoneResult(obj).then(res => {
+                if (res.code === '000000' && res.content) {
+                  if (res.content.length) {
+                    if(flag) {
+                      this.identityNo =  res.content[0].identityNo
+                      this.identityType = res.content[0].identityType
+                    } else {
+                      for (let i = 0; i < res.content.length; i++) {
+                        res.content[i].roomAmount = changeMoney(res.content[i].roomAmount) || '0.00'
+                        res.content[i].checkInNum = res.content[i].checkInNum || '0'
+                      }
+                      this.nameList = res.content 
+                      this.tempCachePhone[obj.phone] = res.content
+                      this.showPhone = true
+                    }
+                    
+                  } else {
+                    this.nameList = []
+                    this.showPhone = false
+                    this.identityNo =  null
+                    this.identityType = null
+                  }
+                } else {
+                  this.nameList = []
+                  this.showPhone = false
+                }
+            })
+          },
+          myBlur(subIndex) {
+            // console.log(subIndex, this.inputBtn1, this.nameInput)
+            setTimeout(() => {
+              this.showName = false
+              this.showPhone = false
+              this.nameInput = false
+              this.phoneInput = false
+            }, 200)
+          },
+          handleEndName (obj) {
+            if (JSON.stringify(this.tempCacheName) == "{}") { // 初始化为空的时候
+              this.getMatchName(obj)
+            } else {
+                if (this.tempCacheName[obj.name] == undefined) { // 不存在 发送请求
+                  this.tempCacheName[obj.name] = []  // 添加属性
+                  this.getMatchName(obj)
+                } else {
+                    this.nameList = this.tempCacheName[obj.name]
+                    if (this.nameList.length) {
+                      this.showName = true
+                    } else {
+                      this.showName = false
+                    }
+                }
+            }
+          },
+          onChangeContactName(val, subIndex, index) {
+            // this.clientIndexFunc(index)
+            let obj = {
+              name: val, 
+            }
+            this.inputBtn1 = subIndex
+            if (val.length) {
+              this.nameInput = false
+              if (validateRule.nation.test(val)) {
+                this.handleEndName(obj)
+              } else {
+                if (val.length > 1) {
+                  this.handleEndName(obj)
+                }
+                
+              }
+            } else {
+              this.showName = false
+              if (this.$props.data.contactName && this.$props.data.contactPhone) {
+                this.nameInput = true
+              } else {
+                this.nameInput = false
+              }
+              
+            }
+          },
+          onChangeContactPhone(val, subIndex) {
+           
+            let obj = {
+              phone: val, 
+            }
+            if (val.length) {
+              this.phoneInput = false
+              this.inputBtn2 = '-1'
+              if (val.length > 3) { 
+                 this.inputBtn2 = subIndex
+                //检索 有匹 配值时 显示
+                if (JSON.stringify(this.tempCachePhone) == "{}") { // 初始化为空的时候
+                  this.getMatchPhone(obj)
+                } else {
+                  if (this.tempCachePhone[val] == undefined) { // 不存在 发送请求
+                    this.tempCachePhone[val] = []  // 添加属性
+                    this.getMatchPhone(obj)
+                  } else {
+                    this.nameList = this.tempCachePhone[val]
+                    if (this.nameList.length) {
+                      this.showPhone = true
+                    } else {
+                      this.showPhone = false
+                    }
+                    
+                  } 
+                }
+              } else {
+                this.showPhone = false
+              }   
+            } else {
+               this.inputBtn2 = subIndex
+               if (this.$props.data.contactName && this.$props.data.contactPhone) {
+                this.phoneInput = true
+              } else {
+                this.phoneInput = false
+              }
+            }
+           
+          },
+          clientIndexFunc(index) {
+            this.clientIndexFlag = 'clientIndex' + index
+          },
+          // 联系人姓名匹配
+          brightenKeyword(val, keyword) {
+            // console.log(165, val, keyword)
+            val = val + '';
+            if (val.indexOf(keyword) !== -1 && keyword !== '') {
+              return val.replace(keyword, '<font color="#2E598C">' + keyword + '</font>')
+            } else {
+              return val 
+              }
+          },
+          //匹配到结果后快速导入
+          chooseName(name, suborderIndex, clientIndex) { 
+            this.$props.data.suborders[suborderIndex].clients[clientIndex].name = name.name
+            this.$props.data.suborders[suborderIndex].clients[clientIndex].phone = name.telephoneNum
+            this.$props.data.suborders[suborderIndex].clients[clientIndex].identityType = name.identityType
+            this.$props.data.suborders[suborderIndex].clients[clientIndex].identityNo = name.identityNo
+            this.showName = false 
+            this.showPhone = false 
+            this.inputBtn1 = '-1'
+            this.inputBtn2 = '-1'
+          },
+          // 号码匹配
+          phoneKeyword(val, keyword) {
+            val = val + '';
+            if (val.indexOf(keyword) !== -1 && keyword !== '') {
+              return val.replace(keyword, '<font color="#2E598C">' + keyword + '</font>')
+            } else {
+              return val 
+              }
+          },
+            nameFocuse(subIndex, subItem, name, sort, index) {
+              // 有多个clients，需要正确定位到对应index输入框
+              this.clientIndexFunc(index)
+              //根据电话号码读取身份信息
+              let obj = {
+                phone: this.$props.data.contactPhone
+              }
+              this.getMatchPhone(obj, true)
+              // 这里的定时器为了保持发生在失焦之后
+              setTimeout(() => {
+                if (this.contactPerson && this.contactMobilePhone) {
+                  if (sort == 'first') {
+                    if (!subItem.name) {
+                      this.inputBtn1 = subIndex
+                      this.nameInput = true
+                      this.phoneInput = false
+                      
+                    }
+                  }
+                  if (sort == 'second') {
+                    if (!subItem.phone) {
+                      this.inputBtn2 = subIndex
+                      this.phoneInput = true
+                      this.nameInput = false
+                    }
+                  }
+                } else {
+                  this.inputBtn1 = '-1'
+                  this.inputBtn2 = '-1'
+                }
+              }, 200)
+              
+            },
+             // 导入
+            inputIt(subIndex, subItem, index) {
+              this.inputBtn1 = '-1'
+              this.inputBtn2 = '-1'
+              for (let c = 0, len0 = this.$props.data.suborders; c < len0.length; c++ ) {
+                if (c == index) {
+                  for (let i = 0; i < this.$props.data.suborders[c].clients.length; i++) {
+                    if(i == subIndex) {
+                      this.$props.data.suborders[c].clients[i].name = this.$props.data.contactName
+                      this.$props.data.suborders[c].clients[i].phone = this.$props.data.contactPhone
+                      this.$props.data.suborders[c].clients[i].identityType = this.identityType
+                      this.$props.data.suborders[c].clients[i].identityNo = this.identityNo
+                    }
+                  }
+                }
+              }
+            },
             roomFindById (roomId) {
-                return this.roomList.filter(item => item.roomId === roomId)
+              return this.roomList.filter(item => item.roomId === roomId)
             },
             showMore (clientsLen, index) {
                 const ref = 'suborderClientWrapper' + index
@@ -472,7 +806,7 @@
                     this.changedCheckInDateIds.push(item.id);
 
                 this.changedRoomIds.indexOf(item.id) < 0 || !item.id ?
-                    this.reComputedSuborderAmount(item, false)
+                    this.reComputedSuborderAmount(item)
                     : this.reComputedSuborderAmount(item)
             },
             switchChecked (item) {
@@ -484,7 +818,8 @@
             onChangeRoom (itemData) {
                 /* 更改房型 */
                 let {roomId, checkInDateView, checkOutDateView, nights, id} = itemData
-                this.checkRoomIsDisAble(itemData)
+                if (itemData.isHourRoom !== 1)
+                    this.checkRoomIsDisAble(itemData)
                 if (this.changedRoomIds.indexOf(id) < 0)
                     this.changedRoomIds.push(id)
                 if (this.changedCheckInDateIds.indexOf(id) < 0 && itemData.id) {
@@ -520,8 +855,12 @@
                 validateRoomRepeat(this.data.suborders)
             },
             reComputedSuborderAmount (itemData, changedRoom = true) {
-                let {roomId, checkInDateView, nights, id} = itemData
-                if (roomId) {
+                /* 
+                    changedRoom  是否要按照真是价格重新计算
+                                false 会按照之前房间单价重新计算
+                */
+                let {roomId, checkInDateView, nights, id, isHourRoom} = itemData
+                if (roomId && isHourRoom !== 1) {
                     let detailsBackups = deepCopy(itemData.details)
                     itemData.details = []
                     let suborderAmountView = 0
@@ -550,7 +889,7 @@
                                     roomId: roomId
                                 }
                                 itemData.details.push(newItem)
-                                suborderAmountView += newItem.roomPrice / 100
+                                suborderAmountView = NP.plus(suborderAmountView, NP.divide(newItem.roomPrice, 100))
                             }
                             break;
                         }
@@ -561,11 +900,86 @@
             },
             validateSuborderAmount (item) {
                 item.suborderAmountViewErrMsg = !item.suborderAmountView ? '订单金额不能为空': ''
+            },
+            validateIdCard (item) {
+                let { identityType, identityNo } = item
+                if (identityType === 0 && (identityNo || identityNo === '0')) {
+                    if (validateRule.idCard.test(identityNo))
+                        item.identityNoErrMsg = ''
+                    else
+                        item.identityNoErrMsg = '身份证格式不正确'
+                } else
+                    item.identityNoErrMsg = ''
             }
         }
     }
 </script>
-
+<style lang='scss'>
+.suborder-item {
+  .inputBtn {
+    position: absolute;
+    top: 37px;
+    z-index: 22;
+    font-size: 14px;
+    font-family: 'PingFangSC-Regular';
+    color: #1F5A8E;
+    line-height: 30px;
+    text-indent: 5px;
+    border-radius: 4px;
+    background: #fff;
+    border: 1px solid #cdcdcd;
+    cursor: pointer;
+  }
+  .sug-ul{
+    position: absolute;
+    overflow-y: auto;
+    padding: 0 12px 10px;
+    z-index: 22;
+    font-size: 12px;
+    width:270px;
+    height:136px;
+    background:rgba(255,255,255,1);
+    border-radius:6px;
+    border:1px solid rgba(205,205,205,1);
+    .sug-li{
+      height: 50px;
+      margin-top: 10px;
+      color: #666666;
+      font-size: 12px;
+      width:233px;
+      border-bottom:2px solid #eee;
+      .t-over {
+        white-space:nowrap; 
+        text-overflow:ellipsis;
+        overflow: hidden;
+      }
+      
+      .clearfix:after {
+        visibility: hidden;
+        display: block;
+        font-size: 0;
+        content: " ";
+        clear: both;
+        height: 0;
+      }
+    }
+    &::-webkit-scrollbar {
+      width: 7px;
+      /*height: 10px;*/
+    }
+    &::-webkit-scrollbar-thumb {
+      border-radius: 4px;
+      -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+      background: #D8D8D8;
+    }
+    &::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+      background: #fff;
+    }
+  }
+}
+</style>
 <style lang="scss">
     @import './suborderItem';
 </style>

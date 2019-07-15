@@ -1,0 +1,104 @@
+.setSpeciaPrice {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  .selectMounth {
+      width: 16%;
+      padding-top: 40px;
+      .selectMounthList {
+          padding: 10px 5px;
+          text-align: center;
+          line-height: 23px;
+          cursor: pointer;
+          span {
+              display: inline-block;
+              width: 40px;
+              height: 20px;
+              /*line-height: 15px;*/
+              color: #000;
+          }
+          span:hover {
+              color: #fff;
+              background-color: #0B8CEF;
+          }
+          .actions {
+              color: #fff;
+              background-color: #0B8CEF;
+          }
+      }
+  }
+  .calendarWatch {
+      width: 84%;
+      .labelHead {
+          width: 100%;
+          height: 40px;
+          color: #000;
+          font-size: 16px;
+          line-height: 40px;
+      }
+      .calendarTable {
+          width: 100%;
+          background-color: #F3F3F3;
+          .calendarWeek {
+              width: 100%;
+              height: 40px;
+              background-color: #0B8CEF;
+              display: flex;
+              li {
+                  width: 93px;
+                  text-align: center;
+                  line-height: 40px;
+                  font-size: 14px;
+                  font-weight: 500;
+                  color: #fff;
+                  border-left: 1px solid #AAAAAA;
+              }
+          }
+          .calendarDayRow {
+              width: 99.9%;
+              border-bottom: 1px solid #AAAAAA;
+              border-left: 1px solid #AAAAAA;
+              border-right: 1px solid #AAAAAA;
+              display: flex;
+              justify-content: flex-start;
+              li {
+                  width: 93px;
+                  height: 55px;
+                  padding-top: 10px;
+                  border-left: 1px solid #AAAAAA;
+                  text-align: center;
+                  font-size: 14px;
+                  color: #4F4F4F;
+                  cursor: pointer;
+                  position: relative;
+              }
+              .festival {
+                  .price {
+                      color: #FB2A2A;
+                  }
+              }
+              .festival:before {
+                  display: inline-block;
+                  line-height: 20px;
+                  width: 20px;
+                  content: '休';
+                  font-size: 10px;
+                  position: absolute;
+                  top: 3px;
+                  right: 8px;
+                  background: rgba(11,140,239,1);
+                  border-radius: 50%;
+                  color: white;
+              }
+              .disabled {
+                  background: '';
+                  cursor: default;
+                  color: #AAAAAA;
+                  .price {
+                      color: #AAAAAA;
+                  }
+              }
+          }
+      }
+  }
+}

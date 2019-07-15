@@ -5,7 +5,9 @@
                 <Col span="2" v-if="!hideLabel">
                     <span style="font-size: 16px;">财务：</span>
                 </Col>
-                <Col :span="hideLabel ? 24 : 22">
+                <Col
+                    :span="hideLabel ? 24 : 22"
+                >
                     <div
                         :style="{
                             position: 'relative',
@@ -13,6 +15,7 @@
                         }"
                         v-for="(item, index) in data.records"
                         :key="index"
+                        class="finance-sub-item"
                     >
                         <Select
                             style="width: 108px;"
@@ -29,6 +32,7 @@
                             style="width: 108px; margin-left: 30px;"
                             :disabled="!item.canEdited"
                             @on-blur="onBlurPrice(item)"
+                            class="finance-input"
                             v-model="item.priceView"
                             placeholder="金额"/>
                         <Select
@@ -71,7 +75,7 @@
                         >
                             <span style="font-size: 14px;">
                                 <Icon type="md-alert" />
-                                数额不可超过1,000,000
+                                {{ item.priceViewErrMsg }}
                             </span>
                         </span>
                     </div>
@@ -127,6 +131,7 @@
                     id: null,
                     financeType: 1,
                     priceView: '',
+                    priceViewErrMsg: '',
                     canEdited: 1,
                     paymentId: this.orderPaymentList[0].id
                 }
@@ -141,6 +146,10 @@
             },
             addPayItem () {
                 this.data.records.unshift(Object.assign({}, this.newRecordsItem))
+                let input = document.getElementsByClassName('finance-item')[0]
+                    .getElementsByClassName('finance-sub-item')[0]
+                    .getElementsByClassName('ivu-input')[0]
+                input.focus()
             },
             removePayItem (index) {
                 this.data.records.splice(index, 1)
@@ -148,7 +157,6 @@
             },
             onBlurPrice (item) {
                 this.moneyToDecimal2(item, 'priceView')
-                console.log('item', item)
                 this.reComputedFinance()
             }
         }

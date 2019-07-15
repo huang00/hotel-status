@@ -1,0 +1,41 @@
+.echartsShow{
+    .ivu-card-body{
+        padding-right: 0
+    }
+}
+.hotel-channel{
+    .table-nav{
+        .ivu-select-selection{
+            border: 1px solid #235F92;
+            border-radius: 20px;
+            color: #9AA7C1;
+            font-size: 14px;
+            .ivu-select-selected-value{
+                font-size: 14px;
+            }
+        };
+    }
+    .ivu-date-picker{
+        .ivu-input{
+            font-size: 14px !important;
+        }
+    }
+}
+.hotel-budget{
+    .typeChooseWrap{
+        .ivu-select-selection{
+            border: 1px solid #235F92;
+            border-radius: 20px;
+            color: #9AA7C1;
+            font-size: 14px;
+        }
+        .ivu-select-selected-value{
+            font-size: 14px;
+        }
+    }
+    .ivu-date-picker{
+        .ivu-input{
+            font-size: 14px;
+        }
+    }
+}

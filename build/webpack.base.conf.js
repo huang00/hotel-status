@@ -16,11 +16,13 @@ module.exports = {
             : config.dev.assetsPublicPath
     },
     // externals: {
-    //     vue: 'Vue',
-    //     'vue-router': 'VueRouter',
-    //     vuex: 'Vuex',
-    //     axios: 'axios',
-    //     iview: 'iView',
+    //     // vue: 'Vue',
+    //     // 'vue-router': 'VueRouter',
+    //     // vuex: 'Vuex',
+    //     // axios: 'axios',
+    //     // iview: 'iView',
+    //     // 'AMap': 'AMap',
+    //     // 'AMapUI': 'AMapUI'
     // },
     resolve: {
         extensions: ['.js', '.vue', '.json'],
@@ -32,7 +34,13 @@ module.exports = {
             'common_assets': resolve('src/common_assets'),
             'common_libs': resolve('src/common_libs'),
             'common_store': resolve('src/common_store'),
-            'vue_plugins': resolve('src/vue_plugins')
+            '@': resolve('src'),
+            'hotelFinance': resolve('src/entries/hotelFinance'),
+            'hotelStatus': resolve('src/entries/hotelStatus'),
+            'hotelType': resolve('src/entries/hotelType'),
+            'hotelOrder': resolve('src/entries/hotelOrder'),
+            'hotelLinen': resolve('src/entries/hotelLinen'),
+            'hotelLog': resolve('src/entries/hotelLog')
         }
     },
     module: {
@@ -59,6 +67,16 @@ module.exports = {
             {
                 test: /\.scss$/,
                 loader: 'style!css!sass?sourceMap'
+            },
+            {
+                test: /\.less$/,
+                use: [{
+                    loader: "style-loader" // creates style nodes from JS strings
+                }, {
+                    loader: "css-loader" // translates CSS into CommonJS
+                }, {
+                    loader: "less-loader" // compiles Less to CSS
+                }]
             },
             {
                 test: /\.jade$/,

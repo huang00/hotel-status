@@ -155,7 +155,7 @@ label {
     margin-left: 88px;
 }
 
-.fontSizi14 {
+.fontSize14 {
     font-size: 14px;
 }
 
@@ -163,7 +163,7 @@ label {
     font-size: 12px;
 }
 
-.fontSizi16 {
+.fontSize16 {
     font-size: 16px;
 }
 
@@ -177,22 +177,6 @@ label {
 
 .checkOutBgcolor {
     background-color: $basic-hotelCheckOutColor;
-}
-
-.reserveFontColor {
-    color: $basic-hotelReserveColor;
-}
-
-.checkInFontcolor {
-    color: $basic-hotelCheckInColor;
-}
-
-.checkOutFontcolor {
-    color: #000;
-}
-
-.errorFontcolor {
-    color: #EE3333;
 }
 
 /***********************清楚浮动***********************/
@@ -236,7 +220,7 @@ label {
 
 /*********************** 自定义滚动条样式 ***********************/
 .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 7px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
     background-color: white;
@@ -265,6 +249,7 @@ label {
     word-break: break-all;
     line-break: anywhere;
     display:-webkit-box;
+    box-orient:vertical;
     -webkit-box-orient:vertical;
     -webkit-line-clamp:2;
 }
@@ -277,10 +262,12 @@ label {
     word-break: break-all;
     line-break: anywhere;
     display:-webkit-box;
+    box-orient:vertical;
     -webkit-box-orient:vertical;
     -webkit-line-clamp:3;
 }
 
+/*********************** 渠道展示 ***********************/
 .channel-logo {
     text-align: center;
     display: inline-block;
@@ -310,6 +297,7 @@ label {
 .disabled-select {
     user-select: none;
 }
+
 
 .order-modal-wrap{
     .ivu-modal-header{background: #89A0B1FF;padding:11px 16px}
@@ -458,6 +446,35 @@ label {
     }
 }
 
+.app-header{
+    .accountModal{
+        .modal{
+            .modal-header-wrapper{
+                height: 0 !important;
+                min-height: 0 !important;
+            }
+            .modal-body{
+                padding: 0 !important
+            }
+        }
+    }
+    .ivu-form-item-required{
+        .ivu-form-item-label::after{
+            content: '*';
+            display: inline-block;
+            margin-left: 4px;
+            line-height: 1;
+            font-family: SimSun;
+            font-size: 12px;
+            color: #ed4014;
+        }
+        .ivu-form-item-label::before{
+            display: none
+        }
+    }
+}
+
+
 /* 箭头 ——》 向下 */
 .arrow-down:before {
     left: 60px;
@@ -469,3 +486,111 @@ label {
     position:absolute;
     z-index: 1;
 }
+.order-notice-list{
+    .channel-logo{
+        background-color: #EAEAEAFF
+    }
+}
+
+/***************** 错误提示样式 *****************/
+.wraning {
+    position: absolute;
+    bottom: -4px;
+    color: $basic-warning;
+    height: 22px;
+    z-index: 1;
+}
+
+/***************** 常用按钮样式 *****************/
+.public-buttons {
+    border-radius: $button-radius;
+    font-size: $button-font-size;
+    display: inline-block;
+    width: 110px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    cursor: pointer;
+    color: #fff;
+    user-select: none;
+    vertical-align: middle;
+    transition: all .3s;
+    &.save {
+        background: linear-gradient(270deg,rgba(153,200,135,1) 0%,rgba(79,152,55,1) 100%);
+        box-shadow: 2px 2px 8px 0px rgba(169,242,156,0.45);
+    }
+    &.edit {
+        background: linear-gradient(270deg,rgba(138,173,197,1) 0%,rgba(75,136,188,1) 100%);
+        box-shadow: 2px 2px 8px 0px rgba(56,120,178,0.33);
+    }
+    &.cancle {
+        background: linear-gradient(270deg,rgba(243,243,243,1) 0%,rgba(224,224,224,1) 100%);
+        box-shadow: 2px 2px 8px 0px rgba(183,183,183,0.34);
+        color: #666666;
+    }
+    &.remove {
+        background: linear-gradient(90deg,rgba(128,149,210,1) 0%,rgba(156,178,223,1) 100%);
+        box-shadow: 2px 2px 8px 0px rgba(166,183,218,1);
+    }
+    &.del {
+        background: linear-gradient(270deg,rgba(224,144,144,1) 0%,rgba(195,78,45,1) 100%);
+        box-shadow: 2px 2px 8px 0px rgba(242,191,156,0.45);
+    }
+    &.disabled {
+        background: linear-gradient(270deg,rgba(235,235,235,1) 0%,rgba(224,224,224,1) 100%);
+        box-shadow: 2px 2px 8px 0px rgba(183,183,183,0.34);
+        cursor: not-allowed;
+    }
+}
+
+/***************** 重写form *****************/
+/* 
+    1、重写表单错误提示
+    2、重写form-item margin-bottom
+    3、必填项项提示
+*/
+.form-err {
+    .ivu-form-item {
+        margin-bottom: 20px;
+    }
+    .ivu-form-item:not(.ivu-form-item-required) {
+        .ivu-form-item-label {
+            padding-right: 25px;
+        }
+    }
+    .ivu-form-item-required {
+        .ivu-form-item-label {
+            &:after {
+                content: "*";
+                display: inline-block;
+                margin-right: 4px;
+                line-height: 1;
+                font-family: SimSun;
+                font-size: 12px;
+                color: #D0021B;
+                margin-left: 3px;
+            }
+            &:before {
+                display: none;
+            }
+        }
+    }
+    .ivu-form-item-error-tip {
+        color: $basic-warning;
+        &:before {
+            content: "!";
+            background: $basic-warning;
+            display: inline-block;
+            height: 12px;
+            width: 12px;
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 12px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+    }
+}
+
+

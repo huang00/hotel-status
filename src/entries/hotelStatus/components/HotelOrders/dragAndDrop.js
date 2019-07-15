@@ -2,9 +2,10 @@
  * @Author: huangchao 
  * @Date: 2018-12-08 17:33:39 
  * @Last Modified by: huangchao
- * @Last Modified time: 2018-12-27 20:00:06
+ * @Last Modified time: 2019-01-09 11:26:42
  */
  
+import NP from 'number-precision'
 import {
     compare,
     computedNights,
@@ -13,6 +14,9 @@ import {
     TODAY,
     formatDate
 } from 'common_libs/util'
+import {
+    checkIsPredetermine
+} from 'hotelStatus/libs/util'
 import { deepCopy } from '../../../../common_libs/util';
  
 /**
@@ -60,7 +64,7 @@ export const computedToolTipStyle = (array, maxTop, maxLeft) => {
         let lastItem = sortByClentX[sortByClentX.length-1]
         let top = lastItem.clientY * 80 + 75
         let left = lastItem.clientX * 100 + 80
-        let bodyHeight = document.body.offsetHeight
+        let bodyHeight = document.body.offsetHeight - 135
         let overflowTop = false
         let overflowLeft = false
         
@@ -77,6 +81,7 @@ export const computedToolTipStyle = (array, maxTop, maxLeft) => {
             top: top + 'px',
             left: left +'px',
             display: 'block',
+            width: overflowLeft ? '104px': '157px',
             overflowTop,
             overflowLeft
         }
@@ -130,20 +135,30 @@ export const createdOrderData = (array) => {
 
     function suborderProcess(suborderData) {
         /* 生成子订单数据 */
-        let todayStr = +new Date(formatDate(TODAY))
+        let todayStr = +new Date(formatDate(TODAY)) // 今天八点
+        let todayTwelve = todayStr + (4 * 3600000)    // 今天十二点
+        let currentTime = +new Date() // 当前时间
         let len = suborderData.length
         let checkInDateView = new Date(suborderData[0].currDate)
-        let checkOutDateView = suborderData[len - 1].currDate + 24 * 3600000
+        let checkOutDateView = +new Date(formatDate(suborderData[len - 1].currDate + 24 * 3600000))
         let nights = computedNights(checkInDateView, checkOutDateView)
-        let status = +new Date(formatDate(checkInDateView)) < todayStr && +new Date(formatDate(checkOutDateView)) <= todayStr ?
-            2: 0
+        let isPredetermine = checkIsPredetermine(checkInDateView)
+        let status = (
+            isPredetermine ||
+            checkOutDateView > todayStr ||
+            (
+                checkOutDateView === todayStr &&
+                currentTime < todayTwelve
+            )
+        ) ? 0: 2
+
         let suborderAmountView = 0
         let details = []
         let roomId = suborderData[0].roomId
-        for (let i = len; i--;) {
+        for (let i = 0; i < len; i++) {
             let item = suborderData[i]
             let priceView = item.priceView
-            suborderAmountView += priceView - 0
+            suborderAmountView = NP.plus(suborderAmountView, priceView)
             details.push({
                 id: null,
                 roomPrice: priceView * 100,
@@ -231,7 +246,7 @@ export const computedImpact = (id, top, left, width, existedList) => {
         let itemMinLeft = item.left
         let itemMaxLeft = item.left + item.width
         if (
-            item.top === top && item.id !== id && item.isHourRoom === null &&
+            item.top === top && item.id !== id && item.isHourRoom !== 1 &&
             (   
                 (
                     (maxLeft > itemMinLeft && maxLeft <= itemMaxLeft) ||

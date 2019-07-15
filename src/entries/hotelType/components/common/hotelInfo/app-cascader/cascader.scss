@@ -1,0 +1,95 @@
+.cascader {
+  position: relative;
+  width: 100%;
+  z-index: 3;
+  line-height: 25px;
+  .cascader-rel {
+    position: relative;
+    .input-wrapper {
+      .cascader-input {
+        padding: 3px 25px 3px 10px;
+        border-radius: 3px;
+        width: 100%;
+        outline: none;
+        border: 1px solid #CACACA;
+        line-height: 24px;
+      }
+    }
+    .cascader-arrow {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      line-height: 1;
+      margin-top: -7px;
+      font-size: 14px;
+      color: #808695;
+      transition: all .2s ease-in-out;
+    }
+  }
+  .select-dropdown {
+    padding-top: 10px;
+    top: 30px;
+    // z-index: -1;
+    position: absolute;
+    border: 1px solid red;
+    width: 450px;
+    border: 1px solid #CACACA;
+    background-color: white;
+    border-radius: 3px;
+    border-top-left-radius: 0;
+    .selected {
+      min-height: 45px;
+      .selected-item {
+        border: 1px solid #CFCFCF;
+      }
+    }
+    .select {
+      position: relative;
+      padding-bottom: 10px;
+      .loading {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        line-height: 100%;
+        background: #000;
+        opacity: 0.2;
+        span {
+          color: white;
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          margin: auto;
+          width: 55px;
+          height: 15px;
+          font-size: 14px;
+        }
+      }
+      .select-item {
+        border: 1px solid transparent;
+        border-radius: 9px;
+      }
+      .select-item:hover {
+        border: 1px solid #0B8CEF;
+      }
+    }
+    .item {
+      display: inline-block;
+      padding: 0 10px;
+      margin: 0 10px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  }
+}
+.cascader.open {
+  .cascader-rel { z-index: 1; }
+  .cascader-arrow { transform:rotate(180deg); }
+  .cascader-input {
+    border-bottom: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+}

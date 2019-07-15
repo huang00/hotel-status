@@ -16,9 +16,18 @@
 <script>
     export default {
         name: 'NotOrderData',
+        computed: {
+            userPermissionList () {
+                return this.$store.getters.userPermissionList
+            }
+        },
         methods: {
             jumpToRoomType () {
-                window.location.href = '/hotelType/hotelType.html'
+                this.userPermissionList.map(item => {
+                    if (item === 'R_ROOM_MANAGER')
+                        window.location.href = '/hotelStatus/hotelType.html'
+                })
+                this.$Message.warning('暂无房型添加权限！')
             }
         }
     }

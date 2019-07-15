@@ -43,6 +43,10 @@
         TODAY,
         formatDate
     } from 'common_libs/util'
+    import {
+        checkIsPredetermine,
+        newClientItem
+    } from 'hotelStatus/libs/util'
 
     export default {
         name: 'OrderUpate',
@@ -63,6 +67,10 @@
                     canEdited: 1
                 })
             }
+            this.data.suborders.map((item, index) => {
+                if (!item.clients.length && item.status === 2)
+                    item.clients.push(Object.assign({}, newClientItem))
+            })
         },
         computed: {
             orderPaymentList () {
@@ -70,23 +78,22 @@
             },
             buttonsList () {
                 let buttonsList = []
-                let isRepair = false
-                let today = +new Date(formatDate(TODAY))
+                let isPredetermine = false
+
                 for (let i = this.data.suborders.length; i--;) {
                     let item = this.data.suborders[i]
                     let checkInDate = +new Date(formatDate(item.checkInDateView))
-                    let checkOutDate = +new Date(item.checkOutDateView)
-                    if (checkInDate < today && !this.data.id)
-                        isRepair = true
+                    if (!this.data.id)
+                        isPredetermine = checkIsPredetermine(checkInDate)
                 }
                 if (this.data.id)
                     buttonsList.push('confirm')
-                else if (isRepair)
-                    buttonsList.push('repair')
-                else
+                else if (isPredetermine)
                     buttonsList.push('predetermine')
+                else
+                   buttonsList.push('repair')
                 return buttonsList
-            },
+            }
         }
     }
 </script>

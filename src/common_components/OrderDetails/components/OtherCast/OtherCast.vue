@@ -5,18 +5,21 @@
             <Input
                 style="width: 251px;"
                 placeholder="请输入房费外消费，如没有则填写0"
-                @on-blur="reComputedFinance"
+                @on-blur="onBlurOtherCast"
                 v-model="data.otherCastView"
             />
-            <span class="overflow-prompt">
+            <span class="overflow-prompt" v-if="data.depositView < data.otherCastView">
                 超出 {{ toDecimal2(data.depositView) }} 元押金的部分请现付
             </span>
-            <!-- <span class="wraning">
+            <span
+                class="wraning"
+                v-if="data.otherCastViewErrMsg"
+            >
                 <span style="font-size: 14px;">
                     <Icon type="md-alert" />
-                    嘿嘿，犯错了吧！
+                    {{ data.otherCastViewErrMsg }}
                 </span>
-            </span> -->
+            </span>
         </div>
         <div class="look" v-else>
             其他消费：<span class="amount">￥&nbsp;{{toDecimal2(data.otherCastView)}}</span>
@@ -29,7 +32,13 @@ import Base from '../Mixins/base'
 
 export default {
     name: 'OtherCast',
-    mixins: [Base]
+    mixins: [Base],
+    methods: {
+        onBlurOtherCast () {
+            this.moneyToDecimal2(this.data, 'otherCastView')
+            this.reComputedFinance()
+        }
+    }
 }
 </script>
 
@@ -48,7 +57,6 @@ export default {
                 color: #D67777;
                 top: 24px;
                 left: 72px;
-                width: 148px;
                 line-height: 32px;
             }
         }

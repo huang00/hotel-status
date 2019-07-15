@@ -2,13 +2,12 @@
  * @Author: huangchao 
  * @Date: 2018-12-12 09:41:56 
  * @Last Modified by: huangchao
- * @Last Modified time: 2018-12-28 14:20:02
+ * @Last Modified time: 2019-01-03 10:06:03
  * @describe  拖动移动
  */
 import {
     computedShadowBoxNextCoor,
-    computedImpact,
-    createdSplitData
+    computedImpact
 } from '../dragAndDrop'
 import {
     GRIDEWIDTH,
@@ -39,7 +38,7 @@ import {
          }
      },
      methods: {
-        hanlderMouseMove (event) {
+        handlerMouseMove (event) {
             console.log('move')
             /* mousedown 事件 */
             event = event || window.event
@@ -53,25 +52,26 @@ import {
                 this.showLook = false
                 this.isMove = true
                 this.thisItem.showDetails = false
-            }
-            let top = this.dragTargetOffsetTop + this.tempScrollTop + moveY
-            let left = this.dragTargetOffsetLeft + this.tempScrollLeft + moveX
-            let maxLeft = 3000 - this.thisItem.width
-            let maxTop = this.$refs.hotelOrders.offsetHeight - 80
 
-            top = top <= 0
-                ? 0: top >= maxTop
-                ? maxTop: top
-            left = left <= 0
-                ? 0: left >= maxLeft
-                ? maxLeft: left
+                let top = this.dragTargetOffsetTop + this.tempScrollTop + moveY
+                let left = this.dragTargetOffsetLeft + this.tempScrollLeft + moveX
+                let maxLeft = 3000 - this.thisItem.width
+                let maxTop = this.$refs.hotelOrders.offsetHeight - 80
+
+                top = top <= 0
+                    ? 0: top >= maxTop
+                    ? maxTop: top
+                left = left <= 0
+                    ? 0: left >= maxLeft
+                    ? maxLeft: left
+                    
+                this.thisItem.top = top
+                this.thisItem.left = left
                 
-            this.thisItem.top = top
-            this.thisItem.left = left
-            
-            this.setShadowBoxLocation(moveX, moveY, {
-                maxLeft, maxTop
-            })
+                this.setShadowBoxLocation(moveX, moveY, {
+                    maxLeft, maxTop
+                })
+            }
             event.stopPropagation()
             return false
         },

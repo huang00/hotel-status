@@ -4,12 +4,14 @@
 import axios from 'axios'
 import errorCode from './error_code'
 import {getCookie} from './util';
+import Qs from 'qs'
 
-// let hostname = window.location.hostname
-// if (hostname === '192.168.0.222' || hostname === 'localhost' || hostname === '127.0.0.1') {
-//     axios.defaults.baseURL = 'http://192.168.0.222'
-// }
-axios.defaults.baseURL = 'https://dev.wefint.cn'
+let hostname = window.location.hostname
+if (hostname === '192.168.0.4' || hostname === 'localhost' || hostname === '127.0.0.1') {
+    // axios.defaults.baseURL = 'http://192.168.0.222:10080'
+    axios.defaults.baseURL = 'http://192.168.0.222:10080'
+}
+// axios.defaults.baseURL = 'http://192.168.0.4:10080'
 
 const httpRequestor = {
     // 默认的异常处理方法，会传入完整的data对象，可以在这里弹提示框
@@ -43,11 +45,90 @@ function addVersionToUrl(url) {
  * @param {int?} timeout 超时时间，默认10秒
  * @return {Promise} 返回一个promise对象。其中then方法传递回包中的data数据；catch事件则传递整个回包，其参数为{data:{},status{code:123,message:'xxx'}}
  */
-httpRequestor.post = function postJson(url, data = {}, throwError, timeout) {
+httpRequestor.post = function postJson (url, data = {}, throwError, timeout) {
+    return commonAjax({
+      method: 'POST',
+      url,
+      data: JSON.stringify(data),
+      // data: Qs.stringify(data),
+      errorHandler: !throwError && httpRequestor.defaultErrorHandler || null,
+      timeout: timeout || DEFAULT_TIME_OUT,
+      // withCredentials: true,
+      headers: {
+        'Content-Type': 'application/json'
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+        // 'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+  }
+
+/**
+ * 通过post发送数据，使后端直接收到formData格式的数据。并统一处理常见的错误
+ * @param {string} url
+ * @param {object?} data={}
+ * @param {boolean?} throwError 是否不使用默认的异常处理方法，而把异常抛出来
+ * @param {int?} timeout 超时时间，默认10秒
+ * @return {Promise} 返回一个promise对象。其中then方法传递回包中的data数据；catch事件则传递整个回包，其参数为{data:{},status{code:123,message:'xxx'}}
+ */
+httpRequestor.postFormData = function postFormData(url, data = {}, throwError, timeout,fileType = '') {
+    let ret = '';
+    for (let it in data) {
+        ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&';
+    }
+    data = ret;
+    return commonAjax({
+        method: 'POST',
+        url,
+        data: data,
+        responseType: fileType,
+        // data: Qs.stringify(data),
+        errorHandler: !throwError && httpRequestor.defaultErrorHandler || null,
+        timeout: timeout || DEFAULT_TIME_OUT,
+        // withCredentials: true,
+        headers: {
+            'Content-Type': "application/x-www-form-urlencoded"
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+            // 'X-Requested-With': 'XMLHttpRequest'
+        }
+    });
+};
+
+/**
+ * 通过post发送数据，使后端直接收到form - urlencoded格式的数据。并统一处理常见的错误
+ * @param {string} url
+ * @param {object?} data={}
+ * @param {boolean?} throwError 是否不使用默认的异常处理方法，而把异常抛出来
+ * @param {int?} timeout 超时时间，默认10秒
+ * @return {Promise} 返回一个promise对象。其中then方法传递回包中的data数据；catch事件则传递整个回包，其参数为{data:{},status{code:123,message:'xxx'}}
+ */
+httpRequestor.postByFormStr = function postFormStr(url, data = {}, throwError, timeout) {
+    return commonAjax({
+        method: 'POST',
+        url,
+        // params: data,
+        data: Qs.stringify(data),
+        errorHandler: !throwError && httpRequestor.defaultErrorHandler || null,
+        timeout: timeout || DEFAULT_TIME_OUT,
+        // withCredentials: true,
+        headers: {
+            // 'Content-Type': 'application/json'
+            'Content-Type': 'application/x-www-form-urlencoded',
+            // 'X-Requested-With': 'XMLHttpRequest'
+        }
+    });
+};
+
+/**
+ * 通过表单发送同步的post请求，服务器端可以在回包时重定向或下发文件
+ * @param {string} url
+ * @param {object?} data={} 要发送数据的键值对，值不可以是对象，必须序列化成字符串
+ */
+httpRequestor.filePost = function postJson(url, data = {}, throwError, timeout) {
     return commonAjax({
         method: 'POST',
         url,
         data: JSON.stringify(data),
+        responseType: 'arraybuffer',
         // data: Qs.stringify(data),
         errorHandler: !throwError && httpRequestor.defaultErrorHandler || null,
         timeout: timeout || DEFAULT_TIME_OUT,
@@ -59,6 +140,7 @@ httpRequestor.post = function postJson(url, data = {}, throwError, timeout) {
         }
     });
 };
+
 
 /**
  * 通过表单发送同步的post请求，服务器端可以在回包时重定向或下发文件
@@ -145,7 +227,6 @@ function commonAjax(config) {
  */
 function handleResponseSuccess(response) {
     const result = response.data;
-
     if (typeof result.code !== 'number') {
         // 老版本协议下发的数据，只有data
         // console.warn('Old version of protocol.', response.config.url)
@@ -165,6 +246,11 @@ function handleResponseSuccess(response) {
  */
 function handleResponseFail(error) {
     let result
+    /* token验证失效 */
+    if (error.response.status === 401) {
+        alert('token失效，请重新登录！')
+        window.location.href="/index/index.html#/"
+    }
     if (error.response) {
         // 请求已发送，响应中返回了非2xx的错误码，包括304等
         const codeMap = {

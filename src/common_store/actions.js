@@ -2,7 +2,7 @@
  * @Author: huangchao 
  * @Date: 2018-12-06 11:21:23 
  * @Last Modified by: huangchao
- * @Last Modified time: 2018-12-28 10:59:00
+ * @Last Modified time: 2019-02-12 16:40:38
  */
 
 import {
@@ -226,7 +226,7 @@ export default {
                             let festivalDate = +new Date(formatDate(subItem.festivalDate))
                             if (dateListDate >= festivalStartDate && dateListDate <= festivalEndDate) {
                                 if (dateListDate === festivalDate)
-                                    item.isFestivalName = subItem.name.slice(0, -1);
+                                    item.isFestivalName = subItem.name
                                 item.isFestival = true;
                             }
                         }
@@ -257,6 +257,54 @@ export default {
             }
             commit('setSuborderList', hotelOrderList)
             commit('setHotelOrderList', hotelOrderList)
+        })
+    },
+    getUserInfo ({commit}) {
+        let getInn = new Promise(res => {
+            publicHttpServer.getUserInfo({
+                innId: INNID
+            }).then(response => {
+                if (response.code === '000000' && response.content)
+                    res(response.content)
+            })
+        })
+        let base = new Promise(res => {
+            publicHttpServer.baseInfo({
+                token: getCookie('token')
+            }).then(response => {
+                if (response.code === '000000' && response.content)
+                    res(response.content)
+            })
+        })
+        Promise.all([getInn, base]).then(res => {
+            let innList = res[1].innList
+            commit('setUserInfo', Object.assign(res[1], res[0]))
+            for (let i = 0, len = innList.length; i < len; i++) {
+                let item = innList[i]
+                if (item.innId == INNID) {
+                    commit('setUserPermissionList', item.permissions)
+                }
+            }
+        })
+    },
+    /**
+     * 请求 获取客栈列表
+     * @param commit
+     */
+    getHotelList ({commit}) {
+        publicHttpServer.getHotelList().then(res => {
+            if (res.code === '000000' && res.content)
+                commit('setHotelList', res.content)
+        })
+    },
+    /**
+     * 请求 所有菜单权限列表
+     * @param commit
+     */
+    getAllPermissionList ({commit}) {
+        publicHttpServer.getAllPermissionList().then(res => {
+            if (res.code === '000000' && res.content)
+                commit('setAllPermissionList', res.content)
         })
     }
 }

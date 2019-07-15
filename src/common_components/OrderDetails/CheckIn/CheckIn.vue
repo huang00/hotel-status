@@ -32,33 +32,30 @@
 
 <script>
     import orderDetailsMixins from '../Mixins/orderDetails'
+    import {
+        newClientItem
+    } from 'hotelStatus/libs/util'
 
     export default {
         name: 'OrderLook',
         mixins: [ orderDetailsMixins ],
         data () {
             return {
-                edit: true,
-                newClientItem: {
-                    id: null,
-                    name: null,
-                    phone: '',
-                    identityType: 0,
-                    identityNo: ''
-                }
+                edit: true
             }
         },
         created() {
             this.data.suborders.map((item, index) => {
                 // item.checked = index === 0
                 if (!item.clients.length && item.status === 0)
-                    item.clients.push(Object.assign({}, this.newClientItem))
+                    item.clients.push(Object.assign({}, newClientItem))
             })
             if (!this.data.records.length) {
                 this.data.records.push({
                     id: null,
                     financeType: 1,
                     priceView: '',
+                    priceViewErrMsg: '',
                     paymentId: this.orderPaymentList[0].id,
                     canEdited: 1
                 })

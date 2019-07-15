@@ -1,0 +1,113 @@
+.roomAmount {
+  margin: 0 auto;
+  margin-top: 30px;
+  min-width: 1140px;
+  .explain {
+    border: 1px solid #EFA4A4;
+    background-color: #B1E9F5;
+    border-left-width: 8px;
+    padding-left: 10px;
+    line-height: 31px;
+    .sircle {
+      border: 1px solid #543D10;
+      border-radius: 50%;
+      display: inline-block;
+      height: 15px;
+      line-height: 15px;
+      width: 15px;
+      text-align: center;
+      font-style: inherit;
+    }
+  }
+  .calendar {
+    border-left: 1px solid #E4E4E4;
+    border-top: 1px solid #E4E4E4;
+    .head {
+      .grid {
+        background-color: #EFEFEF;
+        height: 65px;
+        line-height: 65px;
+        .mark {
+          display: inline-block;
+          width:30px;
+          height:16px;
+          border-radius:8px;
+          font-size: 10px;
+          line-height: 16px;
+          text-align: center;
+          margin-left: 3px;
+          color: white;
+        }
+        .MayOrSat { color: #0B8CEF; }
+        p { line-height: 19px; }
+        .mark.today { background-color: #F51C1C; }
+      }
+      .column0 i { vertical-align: text-bottom; cursor: pointer; }
+      .grid:not(.column0) { cursor: pointer; padding-top: 5px; }
+    }
+    .body {
+      .grid {
+        .stop {
+          display: block;
+          background-color: #EFA4A4;
+          height:54px;
+          font-size: 14px;
+          color: #FFFFFF;
+        }
+      }
+      ul:hover {
+        .grid:not(.title) { background-color: #E4FAFF; }
+      }
+    }
+    .grid {
+      width: 6.2%;
+      height: 55px;
+      line-height: 55px;
+      text-align: center;
+      border-right: 1px solid #E4E4E4;
+      border-bottom: 1px solid #E4E4E4;
+      cursor: pointer;
+    }
+    .grid.title {
+      width: 13.2%;
+      cursor: default;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .grid.remainNot { background-color: #F6F6F6; }
+    .grid:hover:not(.title):not(.row0) { background-color: #AEEDFA !important; }
+    .grid.disabled { pointer-events: none; }
+    .mark.festival { background-color: #0366B2; }
+    .grid.Sunday, .grid.activeColumn { border-right-color: #52CCE6; }
+  }
+  .notChannelId {
+    text-align: center;
+    font-size: 16px;
+    p { margin-top: 15px; }
+    span {
+      display: inline-block;
+      color: #565656;
+      height: 34px;
+      line-height: 34px;
+      width: 180px;
+      border: 1px solid #838181;
+      border-radius: 6px;
+      margin-top: 15px;
+    }
+    span:hover {
+      background: #0B8CEF;
+      border: 1px solid #0B8CEF;
+      color: white;
+      cursor: pointer;
+    }
+  }
+  .clearfix {
+    li { float: left; }
+  }
+}
+.colorPicker {
+  height: 40px;
+  width: 100px;
+  border-radius: 10px;
+}

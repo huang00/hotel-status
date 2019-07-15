@@ -1,0 +1,79 @@
+.eBookingMain {
+  .connect, .connected {
+      padding-bottom: 10px;
+      .connectMain, .connectedMain {
+          height: 35vh;
+          overflow-y: auto;
+          .roomTypeItem {
+              width: 13.5%;
+              float: left;
+              height: 32px;
+              margin-right: 8%;
+              margin-bottom: 30px;
+              .itemGroup {
+                  display: flex;
+                  align-items: flex-end;
+                  justify-content: space-between;
+                  img { cursor: pointer; margin-left: 12px; }
+              }
+          }
+          
+      }
+      .getUptodateHotelType {
+          text-align: right;
+          margin-top: 15px;
+          span {
+              width:132px;
+              height:30px;
+              line-height: 30px;
+              background:rgba(255,255,255,1);
+              border-radius:4px;
+              color: #2B2B2B;
+              display: inline-block;
+              border: 1px solid #B4B4B4;
+              padding-right: 7px;
+              cursor: pointer;
+              img { vertical-align: middle; }
+          }
+      }
+      .notData {
+          height: 25vh;
+          line-height: 155px;
+          color: #ccc;
+          font-size: 16px;
+          text-align: center;
+      }
+  }
+  .brokerage {
+      .brand {
+          display: flex;
+          justify-content: space-between;
+          width: 570px;
+          margin: 0 auto;
+          .brandItem {
+              width: 147px;
+              height: 182px;
+              background-position: center center;
+              background-size: 100% 100%;
+              background-repeat: no-repeat;
+              text-align: center;
+              P:first-child { margin-top: 120px; }
+              p:last-child { 
+                  margin-top: 10px; 
+                  cursor: pointer;
+                  color: #2579F7;
+              }
+          }
+          .brandItem.qunar { background-image: url('./img/qunar.png') }
+          .brandItem.ctrip { background-image: url('./img/ctrip.png') }
+          .brandItem.elong { background-image: url('./img/elong.png') }
+      }
+  }
+  .sectionTile {
+      font-size:16px;
+      font-family:MicrosoftYaHei;
+      color:rgba(0,0,0,1);
+      margin-top: 23px;
+      margin-bottom: 20px;
+  }
+}

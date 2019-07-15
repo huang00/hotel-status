@@ -2,18 +2,21 @@
  * @Author: huangchao 
  * @Date: 2018-12-12 15:31:16 
  * @Last Modified by: huangchao
- * @Last Modified time: 2018-12-28 11:00:43
+ * @Last Modified time: 2019-01-09 11:23:04
  * @describe  订单模态框处理
  */
 import { mapMutations, mapActions } from 'vuex'
 import {
     deepCopy,
     mainOrderValidate,
-    validateField,
     isEmptyObject,
     submitOrderDataFilter,
     mainOrderDataProcess
 } from 'common_libs/util'
+import {
+    validateField,
+    reComputedFinance
+} from 'hotelStatus/libs/util'
 import {
     hotelStatusApiSercers
 } from '../../../api/API'
@@ -27,6 +30,11 @@ export default {
             mainOrderData: {},
             showLook: true
         }
+    },
+    created() {
+        this.$root.Bus.$on('on-open-predetermine', this.openPredetermine)
+        this.$root.Bus.$on('on-open-check-in', this.openCheckIn)
+        this.$root.Bus.$on('on-cancle-all-checked', this.cancleAllChecked)
     },
     computed: {
         hotelOrderList () {
@@ -67,11 +75,8 @@ export default {
         handlerUpdate () {
             /* 修改订单 */
             let errObj = mainOrderValidate(this.mainOrderData, validateField)
-            console.log('errObj', errObj)
             if (isEmptyObject(errObj)) {
                 this.mainOrderData.type = this.mainOrderData.id ? 4: 1
-                console.log('验证成功')
-                return false
                 this.saveOrder(submitOrderDataFilter(this.mainOrderData))
             } else
                 this.$root.Bus.$emit('on-order-form-validate', errObj)
@@ -103,9 +108,21 @@ export default {
         onConfirmCancleOrder () {
             /* 确定取消订单 */
             let cancleOrder = deepCopy(this.mainOrderData)
+            let cancleOrderFinanceList = this.$store.getters.financeListByCancleOrder.filter(item => item.priceView || item.priceView === 0)
+            cancleOrder.records = cancleOrder.records.concat(cancleOrderFinanceList)
+            let reComputedValue = reComputedFinance(cancleOrder)
+            /* 重新计算财务 */
+            cancleOrder.totalAmountView = reComputedValue.totalAmountView
+            cancleOrder.paidAmountView = reComputedValue.paidAmountView
+            cancleOrder.depositView = reComputedValue.depositView
+            cancleOrder.subsidyView = reComputedValue.subsidyView
+
             cancleOrder.orderStatus = 5
             cancleOrder.type = 3
-            this.saveOrder(submitOrderDataFilter(cancleOrder))
+
+            let isPassValidate = cancleOrder.records.filter(item => item.priceViewErrMsg)
+            if (!isPassValidate.length)
+                this.saveOrder(submitOrderDataFilter(cancleOrder))
         },
         handlerCheckIn () {
             /* 办理入住 */
@@ -122,12 +139,15 @@ export default {
         },
         handlerCheckOut () {
             /* 办理退房 */
-            let checkOutOrder = deepCopy(this.mainOrderData)
-            checkOutOrder.suborders.map(item => {
-                item.checked && (item.status = 2)
-            })
-            checkOutOrder.type = 6
-            this.saveOrder(submitOrderDataFilter(checkOutOrder))
+            let errObj = mainOrderValidate(this.mainOrderData, validateField)
+            if (isEmptyObject(errObj)) {
+                let checkOutOrder = deepCopy(this.mainOrderData)
+                checkOutOrder.suborders.map(item => {
+                    item.checked && (item.status = 2)
+                })
+                checkOutOrder.type = 6
+                this.saveOrder(submitOrderDataFilter(checkOutOrder))
+            }
         },
         saveOrder (mainOrder) {
             let backupsHotelOrderList = deepCopy(this.hotelOrderList)

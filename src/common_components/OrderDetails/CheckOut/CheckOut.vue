@@ -12,6 +12,12 @@
                     order-opr-type="check-out"
                     :edit="false">
                 </suborder-item>
+                <template v-if="data.payType === 'quickly'">
+                    <other-cast
+                        :data="data"
+                        :edit="edit"
+                    ></other-cast>
+                </template>
                 <Remark
                     :data="data"
                     :edit="edit">

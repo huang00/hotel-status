@@ -14,7 +14,7 @@
                 :key="subIndex"
                 :clinteY='index'
                 :clinteX='subIndex'
-                @mousedown.stop="liMouseDownIsTure(index, subIndex)"
+                @mousedown.stop="liMouseDownIsTure(index, subIndex, $event)"
                 :style="{backgroundColor: activeColumn === subIndex?'#F7FCFF':''}"
                 @mouseover.stop="liMouseoverIsTure(index, subIndex)">
                 <div
@@ -60,7 +60,6 @@
             v-for="item in suborderList"
             :key="item.id"
             class="order-info-wrapper"
-            v-if="item.isHourRoom === null"
             :style="{
                 top: item.top + 'px',
                 left: item.left + 'px',
@@ -122,32 +121,6 @@
             ></order-info>
         </div>
 
-        <!-- 显示 预定、取消、入住 -->
-        <div
-            :class="{
-                'tool-tip': true,
-                'overflow-left': toolTipStyle.overflowLeft,
-                'overflow-top': toolTipStyle.overflowTop
-            }"
-            ref="toolTip"
-            :style="toolTipStyle">
-            <span
-                @click="openPredetermine"
-                @mouseup.stop
-                class="predetermine"
-            >预定</span>
-            <span
-                @click="openCheckIn"
-                @mouseup.stop
-                v-if="showCheckInButton"
-                class="check-in">入住</span>
-            <span
-                @click="cancleAllChecked"
-                @mouseup.stop
-                class="cancle"
-            >取消</span>
-        </div>
-
         <!-- 详情模态框 -->
         <app-modal
             v-model="orderDetailsModal"
@@ -156,12 +129,15 @@
             @on-cancle="closeOrderDetailsModal"
         >
             <!-- 钟点房导航 -->
-            <hour-room-nav
+            <div
+                class="hour-room-nav position_x_c"
                 v-if="modalType === 'look'"
-                :order-ids="hourRoomOrderIds"
-                @on-switch-hour-room="switchHourRoom"
             >
-            </hour-room-nav>
+                <tabs-nav
+                    :list="hourRoomOrderIds"
+                    @on-change="switchHourRoom"
+                ></tabs-nav>
+            </div>
 
             <template v-if="modalType === 'look'">
                 <look-order-detail
@@ -194,8 +170,10 @@
             :height="400"
             @on-cancle="onCancleOrder"
             @on-ok="onConfirmCancleOrder"
-            title="取消订单"
-            >
+            :title="
+                !!mainOrderData.otaOrderNo ? '未到 NO SHOW': '取消订单'
+            "
+        >
             <cancle-order-detail
                 :data="mainOrderData"></cancle-order-detail>
         </app-modal>
@@ -214,7 +192,7 @@
                 font-size: 16px;
                 color: '#666666';
                 font-family:MicrosoftYaHei;
-                line-height: 100px;
+                line-height: 65px;
                 text-align: center;"
             >
                 确认换房？
@@ -225,6 +203,7 @@
 
 <script>
     import AppModal from 'common_components/AppModal/'
+    import TabsNav from 'common_components/TabsNav/'
     import LookOrderDetail from 'common_components/OrderDetails/Look/'
     import UpdateOrderDetail from 'common_components/OrderDetails/Update/'
     import CheckInOrderDetail from 'common_components/OrderDetails/CheckIn/'
@@ -232,7 +211,6 @@
     import CancleOrderDetail from 'common_components/OrderDetails/Cancle/'
 
     import OrderInfo from './components/OrderInfo/'
-    import HourRoomNav from './components/HourRoomNav/'
     import style from './Mixins/style'
     import dragSelect from './Mixins/dragSelect'
     import dragMove from './Mixins/dragMove'
@@ -249,6 +227,9 @@
         submitOrderDataFilter,
         mainOrderDataProcess
     } from 'common_libs/util'
+    import {
+        checkIsPredetermine
+    } from 'hotelStatus/libs/util'
     import {
         computedRealSelectItems,
         createdOrderData,
@@ -290,15 +271,17 @@
                 split: false,
                 splitOrderOriginWidth: 0, // 拆分订单原始的宽度
                 splitOrderOriginLeft: 0, // 拆分订单原始的left
-                hourRoomOrderIds: []
+                hourRoomOrderIds: [],
+                downScrollLeft: 0, // 当鼠标按下时的left值
+                downScrollTop: 0 // 当鼠标按下时的top值
             }
         },
         components: {
             AppModal,
+            TabsNav,
             LookOrderDetail,
             UpdateOrderDetail,
             OrderInfo,
-            HourRoomNav,
             CheckInOrderDetail,
             CheckOutOrderDetail,
             CancleOrderDetail
@@ -311,7 +294,7 @@
                 return this.$store.getters.theCurrentNeedToQueryTheStartTime
             },
             suborderList () {
-                return this.$store.getters.suborderList
+                return this.$store.getters.suborderList.filter(item => item.isHourRoom !== 1)
             },
             hourRoomList () {
                 let suborderList = this.$store.getters.suborderList
@@ -324,7 +307,9 @@
                             ...item,
                             hourRoomStyleLeft: item.left + 60,
                             isImpact: false,
-                            orderIds: [item.orderId]
+                            orderIds: [
+                                {value: item.orderId, label: '钟点房1'}
+                            ]
                         })
                 }
                 /* 把相同位置的钟点房 加到一个orderIds里面 */
@@ -336,7 +321,10 @@
                             item.top === subItem.top &&
                             item.left === subItem.left &&
                             item.id !== subItem.id
-                        ) item.orderIds.push(subItem.orderId)
+                        )   item.orderIds.push({
+                                value: subItem.orderId,
+                                label: `钟点房${item.orderIds.length + 1}`
+                            })
                     }
                 }
                 /* 检测碰撞 */
@@ -351,7 +339,7 @@
                             item.top === subItem.top &&
                             item.left >= minLeft &&
                             item.left < maxLeft &&
-                            subItem.isHourRoom === null
+                            subItem.isHourRoom !== 1
                         ) {
                             item.isImpact = true
                             continue loop;
@@ -364,22 +352,22 @@
         created() {
             document.addEventListener('mouseup', this.logThisMouseUp)
             this.$root.Bus.$on('on-bus-look-order-detail', (mainOrderData, modalType, callback) => {
-                this.mainOrderData = mainOrderDataProcess(mainOrderData)
+                this.mainOrderData = mainOrderDataProcess(mainOrderData, this.$store.getters.orderFromList)
                 this.modalType = modalType
                 this.orderDetailsModal = true
                 callback && callback('success')
             })
         },
         methods: {
-            switchHourRoom (orderId) {
-                // console.log('切换钟点房', orderIds)
+            switchHourRoom (item) {
+                let orderId = item.value
                 this.mainOrderData =
                     deepCopy(this.hotelOrderList.filter(item => item.id === orderId)[0])
             },
             openHourRoomDetail (item) {
                 this.hourRoomOrderIds = item.orderIds
                 this.openOrderDetail({
-                    orderId: item.orderIds[0]
+                    orderId: item.orderIds[0].value
                 })
             },
             onConfirmSwitchRoom () {
@@ -391,7 +379,7 @@
                 if (this.split)
                     suborderList.push(createdSplitData(backupsItem).forgery)
                 
-                for (let i = suborderList.length; i--;) {
+                for (let i = 0, len = suborderList.length; i < len; i++) {
                     let item = suborderList[i]
                     if (item.id === backupsItem.id) {
                         item.roomId = this.roomIds[item.top / GRIDEHEIGHT]
@@ -400,9 +388,14 @@
                         item.checkOutDateView = item.status === 0 ?
                             item.checkInDateView + 24 * 3600000 * item.nights
                             : this.dateList[(item.left - 0 + item.width) / GRIDEWIDTH ].strDate
+                        /* 换房 处理details */
                         if (this.split) {
                             item.details = createdSplitData(backupsItem).real.details
                             item.suborderAmountView = createdSplitData(backupsItem).real.suborderAmountView
+                        } else {
+                            item.details.map((subItem, index) => {
+                                subItem.checkInDate = item.checkInDateView + (24 * 3600000 * index)
+                            })
                         }
                     }
                 }
@@ -480,7 +473,6 @@
                     }
                 }
                 this.resetData()
-                console.log('鼠标弹起')
             },
             createdOrderData () {
                 /* 计算出toolTip的位置 */
@@ -490,7 +482,22 @@
                 this.mainOrderData.suborders = orderData.suborders
                 this.mainOrderData.totalAmountView = orderData.totalAmountView
                 this.mainOrderData.subsidyView = orderData.totalAmountView
-                this.showCheckInButton = orderData.suborders.every(item => +new Date(formatDate(item.checkInDateView)) === +new Date(formatDate(TODAY)))
+                this.showCheckInButton = orderData.suborders.every(item => {
+                    let checkInDateView = formatDate(item.checkInDateView)
+                    this.$parent.isPredetermine = checkIsPredetermine(+new Date(item.checkInDateView))
+                    /* 
+                        可直接办理入住
+                        一、（1）入住时间等于当天时间
+                        二、（1）是昨天的入住时间
+                            （2）办理时，当前时间是12点之前
+                     */
+                    let today = +new Date(`${formatDate(TODAY)} 00:00:00`) // 今天零点
+                    let yesterday = today - (24 * 3600000)   // 昨天零点
+                    let currentTime = +new Date()
+                    let todayTwelve = today + (12 * 3600000)    // 今天十二点
+                    return checkInDateView === formatDate(TODAY) ||
+                        (checkInDateView === formatDate(yesterday) && currentTime < todayTwelve)
+                })
             },
             resetData () {
                 this.selectMouseDownTrue = false
@@ -500,39 +507,50 @@
                 this.tempScrollTop = 0
                 this.nowSelectItems = []
                 this.$refs.hotelOrders &&
-                    this.$refs.hotelOrders.removeEventListener('mousemove', this.hanlderMouseMove)
+                    this.$refs.hotelOrders.removeEventListener('mousemove', this.handlerMouseMove)
             },
             liMouseoverIsTure (clientY, clientX) {
                 this.activeColumn = clientX
                 this.selectMouseDownTrue && this.selectNodes(clientY, clientX)
             },
-            liMouseDownIsTure (clientY, clientX) {
-                this.selectMouseDownTrue = true
-                this.selectStartCoorX = clientX
-                this.selectStartCoorY = clientY
-                this.selectNodes(clientY, clientX)
+            liMouseDownIsTure (clientY, clientX, event) {
+                event = event || window.event
+                if (event.button === 0) {
+                    this.selectMouseDownTrue = true
+                    this.selectStartCoorX = clientX
+                    this.selectStartCoorY = clientY
+                    this.selectNodes(clientY, clientX)
+                }
             },
             dragOrderInfo (event, item) {
                 /* moseupdown */
-                item.showDetails = false
-                if (
-                    item.status === 2 ||
-                    (+new Date(formatDate(item.checkOutDateView)) <= +new Date(formatDate(TODAY)) && item.status === 1)
-                ) return false
-                event = event || window.event
-                this.dragMouseDownTrue = true
-                this.dragTargetEl = event.target
-                this.thisItem = item
-                this.dragStartPageX = event.pageX
-                this.dragStartPageY = event.pageY
-                this.dragTargetOffsetLeft = this.dragTargetEl.offsetLeft
-                this.dragTargetOffsetTop = this.dragTargetEl.offsetTop
-                this.forgeryOrderData = createdSplitData(item).forgery
-                /* 拖拽目标元素的宽高及位置 */
-                this.dragTargetWidth = this.dragTargetEl.offsetWidth
-                this.downEventOffsetX = event.offsetX
-
-                this.$refs.hotelOrders.addEventListener('mousemove', this.hanlderMouseMove)
+                if (event.button === 0) {
+                    item.showDetails = false
+                    /* 
+                        禁止拖动
+                        1、退房订单
+                        2、入住订单，并且退房日期小于等于今天
+                    */
+                    if (
+                        item.status === 2 ||
+                        (+new Date(formatDate(item.checkOutDateView)) <= +new Date(formatDate(TODAY)) && item.status === 1)
+                    ) return false
+                    event = event || window.event
+                    this.dragMouseDownTrue = true
+                    this.dragTargetEl = event.target
+                    this.thisItem = item
+                    this.dragStartPageX = event.pageX
+                    this.dragStartPageY = event.pageY
+                    this.dragTargetOffsetLeft = this.dragTargetEl.offsetLeft
+                    this.dragTargetOffsetTop = this.dragTargetEl.offsetTop
+                    this.forgeryOrderData = createdSplitData(item).forgery
+                    /* 拖拽目标元素的宽高及位置 */
+                    this.dragTargetWidth = this.dragTargetEl.offsetWidth
+                    this.downEventOffsetX = event.offsetX
+                    this.downScrollLeft = this.scrollLeft
+                    this.downScrollTop = this.scrollTop
+                    this.$refs.hotelOrders.addEventListener('mousemove', this.handlerMouseMove)
+                }
                 event.stopPropagation()
                 return false
             }
@@ -541,6 +559,13 @@
             theCurrentNeedToQueryTheStartTime (val) {
                 this.cancleAllChecked()
                 this.$parent.$refs.hotelStatusMain.scrollLeft = 0
+            },
+            toolTipStyle: {
+                handler (val) {
+                    this.$parent.toolTipStyle = val
+                    this.$parent.showCheckInButton = this.showCheckInButton
+                },
+                deep: true
             }
         }
     }

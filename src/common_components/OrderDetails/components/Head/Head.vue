@@ -3,13 +3,29 @@
         <div class="edit clearfix" :key="1" v-if="edit">
             <div class="header-left">
                 <p class="user-name-wrapper">
+                    <!-- @compositionend.native="handleEndName" -->
                     <Input
-                        v-model="data.contactName"
+                        v-model.trim="data.contactName"
                         placeholder="联系人"
                         style="width: 160px"
                         :maxlength="inputMaxLen"
+                        @on-keyup="filterExpression(data, 'contactName')"
+                        @on-blur="myBlur(),filterExpression(data, 'contactName')"
                         @on-change="onChangeContactName(data.contactName)"
-                    />
+                    /> 
+                    <!-- 暂时屏蔽 等待测试 -->
+                   <ul  v-show='showName' class='sug-ul' style=" top: 34px;left: 0;">
+                     <li class='sug-li'  v-for=' (n,index) in nameList' @click='chooseName(n)' :key='index'>
+                       <div style="line-height: 22px;" class='clearfix'>
+                          <div  class='t-over'  v-html="brightenKeyword(n.name, data.contactName)"  style='float: left;  text-align: left; width: 108px;'></div>
+                          <div  class='t-over'  style='float: right; text-align: right; width: 120px;'>{{n.telephoneNum}}</div>
+                       </div>
+                       <div class='clearfix' style="line-height: 22px;">
+                         <span style='float:left;display:inline-block;text-align:left;'>历史入住{{n.checkInNum}}次，总房费</span>
+                         <span style="float:left;display:inline-block;text-align:right;color:#D67777">￥{{n.roomAmount}}</span></div>
+                     </li>
+                   </ul>
+                   
                     <Icon type="ios-medical" color="#D67777" />
                     <span class="wraning" v-if="errMsg">
                         <span style="font-size: 14px;">
@@ -18,12 +34,25 @@
                         </span>
                     </span>
                     <Input
-                        v-model="data.contactPhone"
+                        v-model.trim="data.contactPhone"
                         placeholder="电话"
-                        :maxlength="30"
+                        :maxlength="16"
                         style="width: 160px; margin-left: 50px;"
-                        @on-keyup="requiredNumber(data, 'contactPhone')"
-                    />
+                        @on-keyup="validatePhoneNumber(data, 'contactPhone')"
+                        @on-blur="myBlur(),validatePhoneNumber(data, 'contactPhone')"
+                        @on-change="onChangeContactPhone(data.contactPhone)"
+                    /> 
+                    <ul  v-show='showPhone' class='sug-ul' style=" top: 34px;left: 229px;">
+                     <li class='sug-li'  v-for=' (n,index) in nameList' @click='chooseName(n)' :key='index'>
+                       <div style="line-height: 22px;" class='clearfix'>
+                          <div class="t-over" v-html="phoneKeyword(n.telephoneNum, data.contactPhone)"  style='float: left; text-align: left; width: 120px; '></div>
+                          <div class="t-over" style='float: right; width: 108px; text-align: right'>{{n.name}}</div>
+                       </div>
+                       <div class='clearfix' style="line-height: 22px;">
+                         <span style='float:left;display:inline-block;text-align:left;'>历史入住{{n.checkInNum}}次，总房费</span>
+                         <span style="float:left;display:inline-block;text-align:right;color:#D67777">￥{{n.roomAmount}}</span></div>
+                     </li>
+                   </ul>
                 </p>
             </div>
             <div class="header-right">
@@ -31,20 +60,26 @@
                     v-model="data.orderFrom"
                     style="width:133px"
                     :disabled="!!data.otaOrderNo"
+                    label-in-value
+                    ref="orderFrom"
                 >
                     <Option
                         v-for="item in orderFromList" :key="item.id"
                         :value="item.id"
-                    > <span
-                        :class="['channel-logo', getChannelFrom(item.channelCode).className]"
-                        :style="{
-                            color: item.channelColor
-                        }"
+                        @click.native="orderFromChange(item.channelName)"
+                    > 
+                        <span
+                            :class="['channel-logo', getChannelFrom(item.channelCode).className]"
+                            :style="{
+                                color: item.channelColor
+                            }"
                         >
-                        <!-- <template v-if="!getChannelFrom(item.channelCode).className">
+                        <template v-if="!getChannelFrom(item.channelCode).className">
                             {{item.channelName.substring(0, 1)}}
-                        </template> -->
-                        </span> {{item.channelName}}</Option>
+                        </template>
+                        </span>
+                        {{item.channelName}}
+                    </Option>
                 </Select>
             </div>
         </div>
@@ -87,8 +122,13 @@
 
 <script>
     import {
+        hotelStatusApiSercers
+    } from '../../../../entries/hotelStatus/api/API.js'
+    import {
         getChannelFrom,
-        trimAll
+        trimAll,
+        validateRule,
+        changeMoney
     } from 'common_libs/util'
     import Base from '../Mixins/base'
 
@@ -98,13 +138,20 @@
         data () {
             return {
                 getChannelFrom,
-                errMsg: ''
+                errMsg: '',
+                showName: false,
+                showPhone: false,
+                nameList: [],
+                tempCacheName: {},
+                tempCachePhone: {},
             }
         },
         created() {
-            this.$root.Bus.$on('on-order-form-validate', (errObj) => {
-                this.errMsg = errObj.contactName && errObj.contactName.errMsg
-            })
+            if (this.$root.Bus) {
+                this.$root.Bus.$on('on-order-form-validate', (errObj) => {
+                    this.errMsg = errObj.contactName && errObj.contactName.errMsg
+                })
+            }
         },
         computed: {
             orderFromList () {
@@ -116,22 +163,177 @@
                     })
                 }
                 return orderFromList
-            }
+            },
+           
+        },
+        watch: {
+          // showName(val) {
+          //   if (val && this.showPhone )   {
+          //     this.showPhone = false
+          //   }
+          // },
+          // showPhone(val) {
+          //   if (val && this.showPhone )   {
+          //     this.showName = false
+          //   }
+          // }
         },
         methods: {
+          // 获取匹配的联系人
+            getMatchName (obj) {
+              hotelStatusApiSercers.getMatchNameResult(obj).then(res => {
+                  if (res.code === '000000' && res.content) {
+                    if (res.content.length) {
+                      for (let i = 0; i < res.content.length; i++) {
+                        res.content[i].roomAmount = changeMoney(res.content[i].roomAmount) || '0.00'
+                        res.content[i].checkInNum = res.content[i].checkInNum || '0'
+                      }
+                      this.nameList = res.content
+                      this.tempCacheName[obj.name] = res.content
+                      this.showName = true
+                    } else {
+                      this.nameList = []
+                      this.showName = false
+                    }
+                  } else {
+                    this.nameList = []
+                    this.showName = false
+                  }
+              })
+            },
+            getMatchPhone (obj) {
+              hotelStatusApiSercers.getMatchPhoneResult(obj).then(res => {
+                  if (res.code === '000000' && res.content) {
+                    if (res.content.length) {
+                      for (let i = 0; i < res.content.length; i++) {
+                        res.content[i].roomAmount = changeMoney(res.content[i].roomAmount) || '0.00'
+                        res.content[i].checkInNum = res.content[i].checkInNum || '0'
+                      }
+                      this.nameList = res.content 
+                      this.tempCachePhone[obj.phone] = res.content
+                      this.showPhone = true
+                    } else {
+                      this.nameList = []
+                      this.showPhone = false
+                    }
+                  } else {
+                    this.nameList = []
+                    this.showPhone = false
+                  }
+              })
+            },
+          //匹配到结果后快速导入
+            chooseName(name) {
+              this.$props.data.contactName = name.name
+              this.$props.data.contactPhone = name.telephoneNum
+              this.showName = false 
+              this.showPhone = false 
+            },
+            // 联系人姓名匹配
+            brightenKeyword(val, keyword) {
+              // console.log(165, val, keyword)
+              val = val + '';
+              if (val.indexOf(keyword) !== -1 && keyword !== '') {
+                return val.replace(keyword, '<font color="#2E598C">' + keyword + '</font>')
+              } else {
+                return val 
+                }
+            },
+            // 号码匹配
+            phoneKeyword(val, keyword) {
+              // console.log(165, val, keyword)
+              val = val + '';
+              if (val.indexOf(keyword) !== -1 && keyword !== '') {
+                return val.replace(keyword, '<font color="#2E598C">' + keyword + '</font>')
+              } else {
+                return val 
+                }
+            },
             findOrderFromById (fromId) {
                 return this.$store.getters.orderFromList.filter(item => item.id === fromId)
+            },
+            
+            myBlur() {
+              setTimeout(() => {
+                this.showName = false
+                this.showPhone = false
+              }, 200)
+            },
+            handleEndName (obj) {
+              if (JSON.stringify(this.tempCacheName) == "{}") { // 初始化为空的时候
+                this.getMatchName(obj)
+              } else {
+                if(this.tempCacheName[obj.name] == undefined) {
+                  this.tempCacheName[obj.name] = []  // 添加属性
+                  this.getMatchName(obj)
+                } else {
+                  this.nameList = this.tempCacheName[obj.name]
+                  if (this.nameList.length) {
+                    this.showName = true
+                  } else {
+                    this.showName = false
+                  }
+                }
+              }
             },
             onChangeContactName (val) {
                 this.errMsg = !trimAll(val)
                     ? '联系人姓名不能为空' : ''
-            }
+                let availabelVal = trimAll(val) 
+
+                let obj = {
+                  name: val, 
+                }
+                if (availabelVal && availabelVal.length) { 
+                  //检索 有匹 配值时 显示
+                  if (validateRule.nation.test(val)) {
+                    this.handleEndName(obj)
+                  } else {
+                    if (availabelVal.length > 1) {
+                      this.handleEndName(obj)
+                    } 
+                  }
+                } else {
+                  this.showName = false
+                }   
+            },
+            onChangeContactPhone(val) {
+              let availabelPhone = trimAll(val)
+              let obj = {
+                phone: val, //this.$props.data.contactPhone
+              }
+              if (availabelPhone &&  availabelPhone.length > 3) { 
+                //检索 有匹配值时 显示
+                if (JSON.stringify(this.tempCachePhone) == "{}") { // 初始化为空的时候
+                  this.getMatchPhone(obj)
+                } else {
+                  if (this.tempCachePhone[val] == undefined) {
+                    this.tempCachePhone[val] = []  // 添加属性
+                    this.getMatchPhone(obj)
+                  } else {
+                    this.nameList = this.tempCachePhone[val]
+                    if (this.nameList.length) {
+                      this.showPhone = true
+                    } else {
+                      this.showPhone = false
+                    }
+                    
+                  }
+                }
+              } else {
+                this.showPhone = false
+              } 
+            },
+            orderFromChange (value) {
+                this.$refs.orderFrom.$data.values[0].label = value
+            },
         }
     }
 </script>
 
 <style lang="scss" scoped>
     .order-header {
+        position: relative;
         .edit {
             height: 45px;
             padding-top: 6px;
@@ -139,6 +341,53 @@
                 padding-left: 14px;
                 .user-name-wrapper {
                     position: relative;
+                    display:inline-block;
+                    .sug-ul{
+                        position: absolute;
+                        overflow-y: auto;
+                        padding: 0 12px 10px;
+                        z-index: 22;
+                        width: 270px;
+                        height:136px;
+                        background:rgba(255,255,255,1);
+                        border-radius:6px;
+                        border:1px solid rgba(205,205,205,1);
+                        .sug-li{
+                          width: 233px;
+                          height: 50px;
+                          margin-top: 10px;
+                          color: #666666;
+                          font-size: 12px;
+                          border-bottom:2px solid #eee;
+                          .t-over {
+                            white-space:nowrap; 
+                            text-overflow:ellipsis;
+                            overflow: hidden;
+                          }
+                          .clearfix:after {
+                            visibility: hidden;
+                            display: block;
+                            font-size: 0;
+                            content: " ";
+                            clear: both;
+                            height: 0;
+                          }
+                        }
+                        &::-webkit-scrollbar {
+                          width: 7px;
+                          /*height: 10px;*/
+                        }
+                        &::-webkit-scrollbar-thumb {
+                          border-radius: 4px;
+                          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+                          background: #D8D8D8;
+                        }
+                        &::-webkit-scrollbar-track {
+                          -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+                          border-radius: 4px;
+                          background: #fff;
+                        }
+                      }
                     .wraning {
                         position: absolute;
                         color: #D67777;

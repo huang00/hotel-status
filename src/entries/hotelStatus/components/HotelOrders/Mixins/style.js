@@ -2,7 +2,7 @@
  * @Author: huangchao 
  * @Date: 2018-12-11 13:53:05 
  * @Last Modified by: huangchao
- * @Last Modified time: 2018-12-28 10:33:41
+ * @Last Modified time: 2019-01-07 14:41:25
  * @describe  样式设置
  */
 import {
@@ -80,6 +80,10 @@ export default {
                 this.dragTargetEl.style['z-index'] = '0'
                 orderInfo.style['background'] = orderInfoOriginBack
                 orderInfo.style['box-shadow'] = orderInfoOriginShadow
+            }
+            if (oprType === 'origin') {
+                this.$parent.$refs.hotelStatusMain.scrollLeft = this.downScrollLeft
+                this.$parent.$refs.hotelStatusMain.scrollTop = this.downScrollTop
             }
         },
         setShadowBoxStyle (initial, initStyle) {

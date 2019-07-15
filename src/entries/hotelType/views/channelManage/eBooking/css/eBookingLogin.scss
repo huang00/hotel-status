@@ -1,0 +1,66 @@
+.channelLogin {
+  width: 765px;
+  margin: 0 auto;
+  .head {
+      margin-top: 78px;
+      display: flex;
+      justify-content: space-between;
+      .imgs {
+          width: 116px;
+          text-align: center;
+          img {
+              width: 116px;
+              height: 116px;
+              display: block;
+          }
+          p {
+              margin-top: 20px;
+              font-size: 14px;
+          }
+      }
+  }
+  .connetBox {
+      width: 550px;
+      padding-bottom: 20px;
+      background: rgba(255, 255, 255, 1);
+      border-radius: 6px;
+      box-shadow: 2px 0px 6px rgba(205, 205, 205, 1);
+      margin: 0 auto;
+      margin-top: 70px;
+      overflow: hidden;
+      .channelIcon {
+          margin-top: 31px;
+          img {
+              display: block;
+              width: 92px;
+              height: 36px;
+              margin: 0 auto;
+          }
+      }
+      .connetForm {
+          padding: 0 72px;
+          margin-top: 36px;
+          .protocol {
+              color: #2D2D2D;
+              font-size: 14px;
+              span { color: #2584F9; cursor: pointer; }
+              .checkbox {
+                  vertical-align: middle;
+                  padding-bottom: 3px;
+                  display: inline-block;
+                  img { display: block; }
+              }
+          }
+          .loginButton {
+              text-align: center;
+              border-radius:6px;
+              button { 
+                  width: 192px; 
+                  font-size: 16px;
+                  height: 29px;
+                  padding: 0;
+              }
+          }
+      }
+  }
+}

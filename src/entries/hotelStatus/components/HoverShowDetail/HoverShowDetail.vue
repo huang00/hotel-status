@@ -79,7 +79,7 @@ export default {
             let orderViewWidth = this.$parent.$refs.hotelStatusMain.offsetWidth // 订单区域可视宽度
             let top = this.data.top + 60
             let left = this.data.left + this.data.width - 50
-            let bodyHeight = document.body.offsetHeight
+            let bodyHeight = document.body.offsetHeight - 110
             let orderDistanceSpaceLeft = minLeft - this.scrollLeft // 到左边的距离
             let orderDistanceSpaceRight = orderViewWidth - maxLeft + this.scrollLeft // 到右边的距离
 
@@ -87,7 +87,7 @@ export default {
                 left = parseInt(orderViewWidth / 2) + this.scrollLeft
             else if (orderDistanceSpaceRight < 280)
                 left =  this.data.left - 275
-            
+                
             top = top + 86 >= maxHeight && top + 86 >= bodyHeight ?
                 this.data.top - 65 : top
             return {
@@ -102,7 +102,8 @@ export default {
 <style lang="scss">
     .order-details-box {
         position: absolute;
-        width:325px;
+        min-width:335px;
+        padding-right: 5px;
         height:86px;
         background:rgba(0,0,0,0.62);
         border-radius:4px;

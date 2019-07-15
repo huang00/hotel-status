@@ -34,14 +34,43 @@
                 :data="suborderDetails"
                 :scrollLeft="scrollLeft"
             ></hover-show-detail>
+            <opr-tool-tip
+                :tool-tip-style="toolTipStyle"
+                :is-predetermine="isPredetermine"
+                :show-check-in-button="showCheckInButton"></opr-tool-tip>
         </main>
+        <!-- 二当家激活后第一次登录提示 -->
+        <!-- <app-modal
+            v-model="formEr"
+            :width="512"
+            :height="233"
+            :header-hide="true"
+            :closable="false"
+            :mask-closable="false"
+            class="in-first-modal"
+        >
+            <div class="in-first">
+                <p class="title fontSize16 textCent">自动导入客栈</p>
+                <div class="content fontSize14 margin_x_c">
+                    疯特民宿管家与“二当家”公众号账号互通，已为您自动导入客栈信息！
+                </div>
+            </div>
+            <div slot="footer" class="modal-footer textCent">
+                <button class="public-buttons save" @click="formEr = false">确定</button>
+            </div>
+        </app-modal> -->
         <input type="hidden" v-model="theCurrentNeedToQueryTheStartTime">
     </div>
 </template>
 
 <script>
     import { mapActions } from 'vuex'
-    import { formatDate } from 'common_libs/util'
+    import {
+        formatDate,
+        setCookie,
+        getCookie
+    } from 'common_libs/util'
+    // import AppModal from 'common_components/AppModal'
     import TimeAxis from '../components/TimeAxis/'
     import RoomType from '../components/RoomType/'
     import RoomTypeFull from '../components/RoomTypeFull/'
@@ -50,6 +79,7 @@
     import HotelOrdersFull from '../components/HotelOrdersFull/'
     import NotOrderData from '../components/NotOrderData/'
     import HoverShowDetail from '../components/HoverShowDetail/'
+    import OprToolTip from '../components/OprToolTip/'
 
     export default {
         name: 'hotel-status',
@@ -61,7 +91,9 @@
             HotelOrders,
             HotelOrdersFull,
             NotOrderData,
-            HoverShowDetail
+            HoverShowDetail,
+            OprToolTip,
+            // AppModal
         },
         data () {
             return {
@@ -72,13 +104,21 @@
                 scrollLeft: 0,
                 scrollTop: 0,
                 suborderDetails: {},
-                showNotData: false // 延迟显示 没有数据
+                showNotData: false, // 延迟显示 没有数据
+                toolTipStyle: {
+                    display: 'none'
+                },
+                showCheckInButton: false,
+                isPredetermine: false,
+                // formEr: false
             }
         },
         created() {
             setTimeout(() => {
                 this.showNotData = true
             }, 500)
+            // this.formEr = !!getCookie('formEr')
+            // setCookie('formEr', '')
         },
         computed: {
             theCurrentNeedToQueryTheStartTime () {
@@ -178,6 +218,25 @@
             right: 0;
             top: 0;
             background:linear-gradient(270deg,rgba(193,202,217,0.16) 0%,rgba(203,213,230,0) 100%);
+        }
+        .in-first-modal {
+            .in-first {
+                .title {
+                    color: #215D91;
+                }
+                .content {
+                    color: #666666;
+                    width: 347px;
+                    margin-top: 30px;
+                }
+            }
+            .modal-footer {
+                height: 50px;
+                background: #fcfcfc;
+                padding: 8px 35px 0;
+                border-bottom-left-radius: 6px;
+                border-bottom-right-radius: 6px;
+            }
         }
     }
 </style>

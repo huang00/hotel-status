@@ -1,0 +1,69 @@
+.detailAddress {
+  padding-left: 15px;
+  .formLabel::after{
+    content: "*";
+    display: inline-block;
+    margin-left: 4px;
+    line-height: 1;
+    font-family: SimSun;
+    font-size: 12px;
+    color: #ed4014;
+  }
+  .currentLocation, .searchLocation {
+    line-height: 32px;
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+  .searchLocation {
+    margin-bottom: 0px;
+    input{
+      border-radius: 6px;
+    }
+    .ivu-input-group-append{
+      border:none !important;
+      background-color: #fff !important;
+    }
+    .searchButton {
+      background-color: #215D91FF;
+      color: white;
+      font-size: 18px;
+      padding: 0 6px;
+      margin-left: 10px;
+    }
+  }
+  .panel {
+    position: absolute;
+    z-index: 1;
+    top: -15px;
+    background-color: white;
+  }
+  .panel.open {
+    transition: all .3s;
+    height: 0;
+    overflow: hidden;
+  }
+  .panel.close {
+    cursor: pointer;
+    line-height: 30px;
+    padding-left: 15px;
+    box-shadow: 1px 2px 1px rgba(0,0,0,.15);
+    color: #3385ff;
+  }
+  main {
+    #map {
+      height: 314px;
+      width: 545px;
+      margin: 0 auto;
+      .loading{
+        position: absolute;
+        width: 545px;
+        height: 314px;
+        background: #fff;
+        opacity: 0.9;
+        text-align: center;
+        line-height: 314px;
+        z-index: 99;
+      }
+    }
+  }
+}

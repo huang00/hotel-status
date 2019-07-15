@@ -7,6 +7,7 @@
  */
 /* eslint-disable*/
 import {allPageloaadServers} from '../common_libs/pageonload'; // 引入PageloadServers 类文件
+import { getCookie } from 'common_libs/util'
 
 let NowUrlHostName = window.location.host; // 检测主机是否在生产环境/
 let PRODUCTION, ADD_IP; // 生产环境变量，单点登录IP地址
@@ -14,6 +15,7 @@ NowUrlHostName === 'wefint.com' || NowUrlHostName === 'www.wefint.com' ?
     (PRODUCTION = 'NOPRODUCTION') && (ADD_IP = 'http://192.168.0.131:9001') :// 'http://115.28.115.6:48080'
     (PRODUCTION = 'NOPRODUCTION') && (ADD_IP = 'http://192.168.0.131:9001'); // 'http://192.168.0.11:48080'
 let pageloadServer = allPageloaadServers; // 实例化 pageloadServer
+const USERID = getCookie('userId')
 /**
  * 所有与登录相关的API模块
  * @type {{loginHttpGetToken: (function(*=, *=)), loginHttpServer: (function(*=, *=))}}
@@ -62,6 +64,12 @@ export const publicHttpServer = {
             console.log('请检查网络环境', err);
         })
     },
+    /* 根据订单id查询订单详情 */
+    getOrderInforByIdNew: (params) => {
+        return httpRequestor.get('/order/get/' + params).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
     /* 获取订单来源 */
     getHotelOrderFrom: (param) => {
         return httpRequestor.get('/order/from', param).catch(err => {
@@ -70,7 +78,7 @@ export const publicHttpServer = {
     },
     /* 获取订单支付方式 =》 改版后*/
     getHotelOrderPayMent: (param) => {
-        return httpRequestor.get('/order/payment', param).catch(err => {
+        return httpRequestor.get('/order/payments', param).catch(err => {
             console.log('请检查网络环境', err);
           
         })
@@ -102,7 +110,72 @@ export const publicHttpServer = {
             console.log('请检查网络环境', err);
           
         })
-    }
+    },
+    /* 获取用户信息 */
+    getUserInfo: (param) => {
+        return httpRequestor.get('/inn/inn/getInn', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    /* 获取客栈列表 */
+    getHotelList: (param) => {
+        return httpRequestor.get('/user/get/inn/list', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    /* 获取所有菜单权限列表 */
+    getAllPermissionList: (param) => {
+        return httpRequestor.get('/user/permission/list', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    /* 切换客栈 */
+    switchHotel: (param) => {
+        return httpRequestor.postFormData('/user/change/inn', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    securityCode: (param) => {
+        /* 获取图形验证码 */
+        return httpRequestor.get('/user/common/securityCode', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    sendMess: (param) => {
+        /* 请求短信验证码 */
+        return httpRequestor.postFormData('/user/send/mess', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    sendMessToken: (param) => {
+        /* 请求短信验证码 */
+        return httpRequestor.postFormData('/user/send/login/mess', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    updatePhoneCheckCode: (param) => {
+        /* 修改手机号-校验原手机号验证码 */
+        return httpRequestor.postFormData('/user/update/phone/checkCode', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    updatePhone: (param) => {
+        /* 修改手机号-校验原手机号验证码 */
+        return httpRequestor.postFormData('/user/update/phone', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    baseInfo: (param) => {
+        return httpRequestor.get('/auth/base', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    getInnListByPermission: (param) => {
+        // 查询用户拥有某个权限的所有关联客栈
+        return httpRequestor.get('/user/get/innList/by/permission', param).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
 }
 
 export const hotelStatusApiSercers = {
@@ -154,4 +227,40 @@ export let washLinenApiHttpServers = {
            
         }, sucssfunc, true, false)
     }
+};
+
+export let footerWebsocktServers = {
+    getMessageList(params) {
+        return httpRequestor.post('/message/message-service/findMessagePage', params).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    readMessage(params) {
+        /* 设置消息已读 */
+        return httpRequestor.post('/message/message-service/multy/readMessage', params).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+    readAllMessage(params) {
+        /* 设置消息已读 */
+        return httpRequestor.get('/message/message-service/readAllMessage', params).catch(err => {
+            console.log('请检查网络环境', err);
+        })
+    },
+};
+
+export let headerServers = {
+    /* 通过旧密码修改新密码 */
+    updateOldPassword (params) {
+        return httpRequestor.get('/user/updateOldPassword', params).catch(err => {
+        console.log('请检查网络环境', err);
+        })
+    },
+    /* 退出登录 */
+    logout (params) {
+        return httpRequestor.get('/auth/logout', params).catch(err => {
+        console.log('请检查网络环境', err);
+        })
+    },
+
 };

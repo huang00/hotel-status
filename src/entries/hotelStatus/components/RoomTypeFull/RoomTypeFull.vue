@@ -12,9 +12,9 @@
                             height: '100%'
                         }"
                     >
-                        <div style="background: #EDEDED; height: 10px; width: 55px;"></div>
-                        <div style="background: #EDEDED; height: 10px; width: 55px; margin-top: 10px;"></div>
-                        <div style="background: #EDEDED; height: 10px; width: 40px; margin-top: 10px;"></div>
+                        <div style="background: #eaeaea; height: 10px; width: 55px;"></div>
+                        <div style="background: #eaeaea; height: 10px; width: 55px; margin-top: 10px;"></div>
+                        <div style="background: #eaeaea; height: 10px; width: 40px; margin-top: 10px;"></div>
                     </div>
                 </div>
                 <div class="room-name">
@@ -24,8 +24,8 @@
                         :class="['room-name-item', subIndex === 0 ? 'first':'']"
                     >
                         <div>
-                            <div style="background: #EDEDED; height: 10px; width: 55px;"></div>
-                            <div style="background: #EDEDED; height: 10px; width: 40px; margin-top: 10px;"></div>
+                            <div style="background: #eaeaea; height: 10px; width: 55px;"></div>
+                            <div style="background: #eaeaea; height: 10px; width: 40px; margin-top: 10px;"></div>
                         </div>
                     </div>
                 </div>
